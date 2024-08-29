@@ -16,7 +16,8 @@ function App() {
   const [userImage, setUserImage] = useState(null);
 
   useEffect(() => {
-    // Store the authentication status in localStorage when it changes
+    // Store the authentication status in localStorage when it changessss
+    
     localStorage.setItem('isAuthenticated', isAuthenticated);
   }, [isAuthenticated]);
 
