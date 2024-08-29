@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import './App.css';
 import Login from './pages/Login';
-import Signup from './pages/signup';
+import Signup from './pages/Signup';
 import 'react-toastify/dist/ReactToastify.css';
 import Header from './pages/Header';
 import SignupList from './pages/SignupList';

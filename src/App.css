@@ -30,3 +30,7 @@ form {
 .navbar {
   margin-bottom: 2rem;
 }
+.bg-body-tertiary {
+  --bs-bg-opacity: 1 !important;
+  background-color: rgba(0, 74, 185, 0.87) !important;
+}
