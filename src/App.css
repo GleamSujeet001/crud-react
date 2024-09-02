@@ -1,36 +1,37 @@
 /* Center the form container */
-.container {
+/* .container {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
   background-color: #f5f5f5;
-}
+} */
 
 /* Style the form */
-form {
+/* form {
   background: white;
   padding: 2rem;
   border-radius: 8px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 400px;
-}
+} */
 
 /* Style the input fields */
-.form-control {
+/* .form-control {
   margin-bottom: 1rem;
-}
+} */
 
-.btn-primary {
+/* .btn-primary {
   width: 100%;
-}
+} */
 
 /* Navbar styling */
-.navbar {
+/* .navbar {
   margin-bottom: 2rem;
-}
-.bg-body-tertiary {
-  --bs-bg-opacity: 1 !important;
-  background-color: rgba(0, 74, 185, 0.87) !important;
+} */
+.profile_div img{
+  max-width: 56px;
+  border-radius: 50%;
+  border: 1px solid #111;
 }

@@ -1,10 +1,10 @@
-import { Button } from '@mui/material';
+import { Button, Avatar, Box } from '@mui/material';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 
 const Signup = ({ setUserImage }) => {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -15,25 +15,56 @@ const Signup = ({ setUserImage }) => {
   });
 
   const [imagePreview, setImagePreview] = useState("");
+  const [errors, setErrors] = useState({
+    name: "",
+    username: "",
+    contact: "",
+    password: "",
+  });
 
   const handleChange = (event) => {
     const { name, value, files } = event.target;
+
     if (name === "image" && files) {
       setFormData((prevState) => ({
         ...prevState,
-        [name]: files[0]
+        [name]: files[0],
       }));
       setImagePreview(URL.createObjectURL(files[0]));
     } else {
       setFormData((prevState) => ({
         ...prevState,
-        [name]: value
+        [name]: value,
       }));
+      // Clear error for the input field being updated
+      if (value.trim() !== "") {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          [name]: "",
+        }));
+      }
     }
   };
 
+  const validateForm = () => {
+    const newErrors = {
+      name: formData.name.trim() === "" ? "Full Name is required" : "",
+      username: formData.username.trim() === "" ? "Email address is required" : "",
+      contact: formData.contact.trim() === "" ? "Contact No is required" : "",
+      password: formData.password.trim() === "" ? "Password is required" : "",
+    };
+    setErrors(newErrors);
+    const hasErrors = Object.values(newErrors).some(Boolean);
+    if (hasErrors) {
+      toast.error('All fields are mandatory except image');
+    }
+    return !hasErrors;
+  };
+
   const handleSubmit = async (event) => {
-    event.preventDefault(); // Prevent the default form submission
+    event.preventDefault();
+
+    if (!validateForm()) return;
 
     const formDataToSend = new FormData();
     for (const key in formData) {
@@ -41,33 +72,38 @@ const Signup = ({ setUserImage }) => {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/user-signup', {
+      const response = await fetch('http://localhost:3939/user-signup', {
         method: 'POST',
         body: formDataToSend,
       });
 
       if (response.ok) {
         const result = await response.json();
-        toast.success('Signup successful!'); 
+        toast.success('Signup successful!');
         setTimeout(() => {
           navigate('/login');
         }, 2000);
       } else {
         const error = await response.json();
-        toast.error(`Signup Failed: ${error.message}`); 
+        toast.error(`Signup Failed: ${error.message}`);
       }
     } catch (error) {
-      toast.error('Signup Failed!'); 
+      toast.error('Signup Failed!');
     }
   };
 
   return (
-    <div className='wrapper d-flex align-items-center justify-content-center h-100'>
-      <form onSubmit={handleSubmit}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 150px)' }}>
+      <form onSubmit={handleSubmit} style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '8px', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)', width: '100%', maxWidth: '400px' }}>
         <h4 className='text-center mt-2'>Sign Up Here</h4>
+        {imagePreview && (
+            <Box display="flex" justifyContent="center" mt={2}>
+              <Avatar src={imagePreview} alt="Image Preview" sx={{ width: 100, height: 100 }} />
+            </Box>
+          )}
         <div className="mb-3">
           <label htmlFor="name" className="form-label">
-            Full Name
+            Full Name <span style={{ color: 'red' }}>*</span>
           </label>
           <input
             type="text"
@@ -77,11 +113,12 @@ const Signup = ({ setUserImage }) => {
             value={formData.name}
             onChange={handleChange}
             autoComplete="off"
+            style={{ marginBottom: '1rem', borderColor: errors.name ? 'red' : '' }}
           />
         </div>
         <div className="mb-3 mt-4">
           <label htmlFor="username" className="form-label">
-            Email address
+            Email address <span style={{ color: 'red' }}>*</span>
           </label>
           <input
             type="email"
@@ -91,11 +128,12 @@ const Signup = ({ setUserImage }) => {
             value={formData.username}
             onChange={handleChange}
             autoComplete="off"
+            style={{ marginBottom: '1rem', borderColor: errors.username ? 'red' : '' }}
           />
         </div>
         <div className="mb-3">
           <label htmlFor="contact" className="form-label">
-            Contact No
+            Contact No <span style={{ color: 'red' }}>*</span>
           </label>
           <input
             type="number"
@@ -105,11 +143,12 @@ const Signup = ({ setUserImage }) => {
             value={formData.contact}
             onChange={handleChange}
             autoComplete="off"
+            style={{ marginBottom: '1rem', borderColor: errors.contact ? 'red' : '' }}
           />
         </div>
         <div className="mb-3">
           <label htmlFor="password" className="form-label">
-            Password
+            Password <span style={{ color: 'red' }}>*</span>
           </label>
           <input
             type="password"
@@ -119,6 +158,7 @@ const Signup = ({ setUserImage }) => {
             value={formData.password}
             onChange={handleChange}
             autoComplete="off"
+            style={{ marginBottom: '1rem', borderColor: errors.password ? 'red' : '' }}
           />
         </div>
         <div className="mb-3">
@@ -129,12 +169,12 @@ const Signup = ({ setUserImage }) => {
             name="image"
             id="image"
             onChange={handleChange}
+            style={{ marginBottom: '1rem' }}
           />
-          {imagePreview && <img src={imagePreview} alt="Image Preview" style={{ marginTop: '10px', maxWidth: '100px' }} />}
         </div>
-        <button type="submit" className="btn btn-primary mb-3">
+        <Button type="submit" variant="contained" color="primary" style={{ width: '100%' }}>
           Submit
-        </button>
+        </Button>
         <div className="sign-up mt-3 text-center">
           Have an account? <Link to="/login">Create One</Link>
         </div>
