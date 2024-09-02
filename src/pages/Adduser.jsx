@@ -91,7 +91,7 @@ function Adduser({ setIsAuthenticated }) {
         if (profile) formData.append('profile', profile);
 
         try {
-            const response = await axios.post('http://localhost:3939/Add-student', formData, {
+            const response = await axios.post('https://crud-node-kun7.onrender.com/Add-student', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }

@@ -30,7 +30,7 @@ function SignupList({ setIsAuthenticated }) {
 
   // Fetch users on component mount
   useEffect(() => {
-    axios.get('http://localhost:3939/get-user-data')
+    axios.get('https://crud-node-kun7.onrender.com/get-user-data')
       .then(response => {
         setRows(response.data); // Populate rows with user data
       })
@@ -63,11 +63,11 @@ function SignupList({ setIsAuthenticated }) {
         formData.append('image', editData.image);
       }
 
-      axios.put(`http://localhost:3939/update-user-data/${selectedRow._id}`, formData, {
+      axios.put(`https://crud-node-kun7.onrender.com/update-user-data/${selectedRow._id}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
       .then(() => {
-        axios.get('http://localhost:3939/get-user-data') // Fetch updated data
+        axios.get('https://crud-node-kun7.onrender.com/get-user-data') // Fetch updated data
           .then(response => {
             setRows(response.data);
             toast.success('Updated successfully!');
@@ -97,7 +97,7 @@ function SignupList({ setIsAuthenticated }) {
 
   const handleConfirmDelete = () => {
     if (selectedId) {
-      axios.delete(`http://localhost:3939/delete-user-data/${selectedId}`)
+      axios.delete(`https://crud-node-kun7.onrender.com/delete-user-data/${selectedId}`)
         .then(() => {
           setRows(rows.filter(row => row._id !== selectedId));
           toast.success('Deleted successfully!');
@@ -137,7 +137,7 @@ function SignupList({ setIsAuthenticated }) {
                 <TableCell>{row.username}</TableCell>
                 <TableCell>{row.contact}</TableCell>
                 <TableCell>
-                  <Avatar alt={row.name} src={row.imageUrl ? `${row.imageUrl}?t=${new Date().getTime()}` : `http://localhost:3939/${row.image}?t=${new Date().getTime()}`} />
+                  <Avatar alt={row.name} src={row.imageUrl ? `${row.imageUrl}?t=${new Date().getTime()}` : `https://crud-node-kun7.onrender.com/${row.image}?t=${new Date().getTime()}`} />
                 </TableCell>
                 <TableCell>
                   <IconButton aria-label="edit" style={{ color: 'blue' }} onClick={() => handleEdit(row)}>

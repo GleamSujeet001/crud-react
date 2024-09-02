@@ -48,7 +48,7 @@ function StudentList({ setIsAuthenticated, setUserImage ,searchQuery}) {
 
   useEffect(() => {
     setIsAuthenticated(true);
-    axios.get('http://localhost:3939/get-student-data')
+    axios.get('https://crud-node-kun7.onrender.com/get-student-data')
       .then((response) => {
         setRows(response.data);
         setFilteredRows(response.data);
@@ -101,11 +101,11 @@ function StudentList({ setIsAuthenticated, setUserImage ,searchQuery}) {
         formData.append('image', editData.image);
       }
 
-      axios.put(`http://localhost:3939/update-student-data/${selectedRow._id}`, formData, {
+      axios.put(`https://crud-node-kun7.onrender.com/update-student-data/${selectedRow._id}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
         .then(() => {
-          axios.get('http://localhost:3939/get-student-data')
+          axios.get('https://crud-node-kun7.onrender.com/get-student-data')
             .then((response) => {
               setRows(response.data);
               toast.success('Updated successfully!');
@@ -135,7 +135,7 @@ function StudentList({ setIsAuthenticated, setUserImage ,searchQuery}) {
 
   const handleConfirmDelete = () => {
     if (selectedId) {
-      axios.delete(`http://localhost:3939/delete-student-data/${selectedId}`)
+      axios.delete(`https://crud-node-kun7.onrender.com/delete-student-data/${selectedId}`)
         .then(() => {
           setRows(rows.filter(row => row._id !== selectedId));
           toast.success('Deleted successfully!');
@@ -213,7 +213,7 @@ function StudentList({ setIsAuthenticated, setUserImage ,searchQuery}) {
                   <TableCell align="center">
                     <Avatar
                       alt={row.fname}
-                      src={row.profile ? `http://localhost:3939/${row.profile}?t=${new Date().getTime()}` : '/man.png'}
+                      src={row.profile ? `https://crud-node-kun7.onrender.com/${row.profile}?t=${new Date().getTime()}` : '/man.png'}
                       sx={{ width: 56, height: 56 }}
                     />
                   </TableCell>
@@ -248,7 +248,7 @@ function StudentList({ setIsAuthenticated, setUserImage ,searchQuery}) {
               component="div"
               sx={{
                 height: 140, // Set a fixed height for the image container
-                backgroundImage: `url(${row.profile ? `http://localhost:3939/${row.profile}?t=${new Date().getTime()}` : '/man.jpg'})`,
+                backgroundImage: `url(${row.profile ? `https://crud-node-kun7.onrender.com/${row.profile}?t=${new Date().getTime()}` : '/man.jpg'})`,
                 backgroundSize: 'contain', // Scale the image to fit the container
                 backgroundRepeat: 'no-repeat',
                 backgroundPosition: 'center',
