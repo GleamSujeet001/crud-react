@@ -1,28 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import Menu from '@mui/material/Menu';
-import Avatar from '@mui/material/Avatar';
-import Tooltip from '@mui/material/Tooltip';
-import MenuItem from '@mui/material/MenuItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import PersonIcon from '@mui/icons-material/Person';
-import LogoutIcon from '@mui/icons-material/Logout';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import InputAdornment from '@mui/material/InputAdornment';
-import SearchIcon from '@mui/icons-material/Search';
-import { useLocation, NavLink } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
-import HomeIcon from '@mui/icons-material/Home';
-import AddIcon from '@mui/icons-material/Add';
-import LoginIcon from '@mui/icons-material/Login';
-import ProfileCard from './ProfileCard'; // Import ProfileCard component
+import React, { useState, useEffect } from "react";
+import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
+import Menu from "@mui/material/Menu";
+import Avatar from "@mui/material/Avatar";
+import Tooltip from "@mui/material/Tooltip";
+import MenuItem from "@mui/material/MenuItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import PersonIcon from "@mui/icons-material/Person";
+import LogoutIcon from "@mui/icons-material/Logout";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import InputAdornment from "@mui/material/InputAdornment";
+import SearchIcon from "@mui/icons-material/Search";
+import { useLocation, NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import HomeIcon from "@mui/icons-material/Home";
+import AddIcon from "@mui/icons-material/Add";
+import LoginIcon from "@mui/icons-material/Login";
+import ProfileCard from "./ProfileCard"; // Import ProfileCard component
 
 const settings = [
-  { label: 'Profile', icon: <PersonIcon /> },
-  { label: 'Logout', icon: <LogoutIcon /> },
+  { label: "Profile", icon: <PersonIcon /> },
+  { label: "Logout", icon: <LogoutIcon /> },
 ];
 
 function Header({ setIsAuthenticated, userData, onSearch }) {
@@ -30,25 +30,26 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
   const navigate = useNavigate();
 
   const [anchorElUser, setAnchorElUser] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [profileCardOpen, setProfileCardOpen] = useState(false);
 
   useEffect(() => {
     if (userData) {
-      localStorage.setItem('userData', JSON.stringify(userData));
+      localStorage.setItem("userData", JSON.stringify(userData));
     }
   }, [userData]);
 
-  const storedUserData = JSON.parse(localStorage.getItem('userData')) || userData;
+  const storedUserData =
+    JSON.parse(localStorage.getItem("userData")) || userData;
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
   const handleOpenUser = () => {
-    navigate('/Signup-list');
+    navigate("/Signup-list");
   };
   const handleOpenAdUser = () => {
-    navigate('/Adduser');
+    navigate("/Adduser");
   };
 
   const handleCloseUserMenu = () => {
@@ -57,8 +58,8 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
 
   const handleLogout = () => {
     setIsAuthenticated(false);
-    localStorage.removeItem('userData');
-    navigate('/login');
+    localStorage.removeItem("userData");
+    navigate("/login");
   };
 
   const handleSearchChange = (event) => {
@@ -68,10 +69,10 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
     }
   };
 
-  const baseURL = 'http://localhost:3939/';
+  const baseURL = "https://crud-node-kun7.onrender.com/";
 
   const handleProfileUpdate = (updatedData) => {
-    console.log('Updated profile data:', updatedData);
+    console.log("Updated profile data:", updatedData);
     // Handle the update logic here
   };
 
@@ -82,10 +83,10 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
           className="navbar-brand"
           to="/Student-list"
           style={{
-            marginLeft: '3rem',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            marginLeft: "3rem",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
           <img
@@ -94,46 +95,47 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
             width="40"
             height="35"
             className="d-inline-block align-text-top"
-            style={{ marginRight: '0.5rem' }}
+            style={{ marginRight: "0.5rem" }}
           />
-          <span style={{ fontWeight: 'bold', fontSize: '1.5rem' }}>SMS</span>
+          <span style={{ fontWeight: "bold", fontSize: "1.5rem" }}>SMS</span>
         </NavLink>
 
         {/* Home Button */}
-        {(location.pathname === '/Adduser' || location.pathname === '/Signup-list') && (
+        {(location.pathname === "/Adduser" ||
+          location.pathname === "/Signup-list") && (
           <Button
             variant="contained"
             startIcon={<HomeIcon />}
-            sx={{ marginLeft: 'auto', marginRight: '1rem' }}
-            onClick={() => navigate('/Student-list')}
+            sx={{ marginLeft: "auto", marginRight: "1rem" }}
+            onClick={() => navigate("/Student-list")}
           >
             Home
           </Button>
         )}
 
-        {location.pathname === '/' && (
+        {location.pathname === "/" && (
           <Button
             variant="contained"
             startIcon={<LoginIcon />}
-            sx={{ marginLeft: 'auto', marginRight: '1rem' }}
-            onClick={() => navigate('/login')}
+            sx={{ marginLeft: "auto", marginRight: "1rem" }}
+            onClick={() => navigate("/login")}
           >
             Login
           </Button>
         )}
-        {location.pathname === '/login' && (
+        {location.pathname === "/login" && (
           <Button
             variant="contained"
             startIcon={<LoginIcon />}
-            sx={{ marginLeft: 'auto', marginRight: '1rem' }}
-            onClick={() => navigate('/')}
+            sx={{ marginLeft: "auto", marginRight: "1rem" }}
+            onClick={() => navigate("/")}
           >
             Signup
           </Button>
         )}
         {/* Conditionally render avatar only on /signup-list or /Student-list */}
-        {(location.pathname === '/Student-list') && (
-          <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center' }}>
+        {location.pathname === "/Student-list" && (
+          <Box sx={{ flexGrow: 0, display: "flex", alignItems: "center" }}>
             <TextField
               variant="outlined"
               size="small"
@@ -148,11 +150,11 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
                   </InputAdornment>
                 ),
               }}
-              sx={{ marginRight: '1rem' }}
+              sx={{ marginRight: "1rem" }}
             />
             <Button
               onClick={handleOpenUser}
-              sx={{ marginRight: '1rem' }}
+              sx={{ marginRight: "1rem" }}
               variant="contained"
               startIcon={<PersonIcon />}
             >
@@ -160,7 +162,7 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
             </Button>
             <Button
               onClick={handleOpenAdUser}
-              sx={{ marginRight: '1rem' }}
+              sx={{ marginRight: "1rem" }}
               variant="contained"
               startIcon={<AddIcon />}
             >
@@ -168,29 +170,28 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
             </Button>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-              <Avatar
-  src={
-    storedUserData
-      ? `${baseURL}${storedUserData}?t=${new Date().getTime()}`
-      : '/man.png'
-  }
-  alt="User Avatar"
-/>
-
+                <Avatar
+                  src={
+                    storedUserData
+                      ? `${baseURL}${storedUserData}?t=${new Date().getTime()}`
+                      : "/man.png"
+                  }
+                  alt="User Avatar"
+                />
               </IconButton>
             </Tooltip>
             <Menu
-              sx={{ mt: '45px' }}
+              sx={{ mt: "45px" }}
               id="menu-appbar"
               anchorEl={anchorElUser}
               anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
+                vertical: "top",
+                horizontal: "right",
               }}
               keepMounted
               transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
+                vertical: "top",
+                horizontal: "right",
               }}
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
@@ -199,9 +200,9 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
                 <MenuItem
                   key={index}
                   onClick={() => {
-                    if (setting.label === 'Logout') {
+                    if (setting.label === "Logout") {
                       handleLogout();
-                    } else if (setting.label === 'Profile') {
+                    } else if (setting.label === "Profile") {
                       setProfileCardOpen(true);
                     }
                     handleCloseUserMenu();

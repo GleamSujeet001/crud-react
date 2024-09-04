@@ -29,7 +29,7 @@ const StyledAvatar = styled(Avatar)({
   boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
 });
 
-const baseURL = "http://localhost:3939/";
+const baseURL = "https://crud-node-kun7.onrender.com/";
 
 const ProfileCard = ({ open, onClose, onUpdate }) => {
   const [oldPassword, setOldPassword] = useState("");

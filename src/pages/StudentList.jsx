@@ -82,7 +82,7 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
       setLoading(true); // Start loader before fetching data
       try {
         const response = await axios.get(
-          "http://localhost:3939/get-student-data"
+          "https://crud-node-kun7.onrender.com/get-student-data"
         );
         setRows(response.data);
         setFilteredRows(response.data);
@@ -142,14 +142,14 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
 
       try {
         await axios.put(
-          `http://localhost:3939/update-student-data/${selectedRow._id}`,
+          `https://crud-node-kun7.onrender.com/update-student-data/${selectedRow._id}`,
           formData,
           {
             headers: { "Content-Type": "multipart/form-data" },
           }
         );
         const response = await axios.get(
-          "http://localhost:3939/get-student-data"
+          "https://crud-node-kun7.onrender.com/get-student-data"
         );
         setRows(response.data);
         toast.success("Updated successfully!");
@@ -178,7 +178,7 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
     if (selectedId) {
       try {
         await axios.delete(
-          `http://localhost:3939/delete-student-data/${selectedId}`
+          `https://crud-node-kun7.onrender.com/delete-student-data/${selectedId}`
         );
         setRows(rows.filter((row) => row._id !== selectedId));
         toast.success("Deleted successfully!");
@@ -310,7 +310,7 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
                         alt={row.fname}
                         src={
                           row.profile
-                            ? `http://localhost:3939/${
+                            ? `https://crud-node-kun7.onrender.com/${
                                 row.profile
                               }?t=${new Date().getTime()}`
                             : "/man.png"
@@ -358,7 +358,7 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
                     height: 140, // Set a fixed height for the image container
                     backgroundImage: `url(${
                       row.profile
-                        ? `http://localhost:3939/${
+                        ? `https://crud-node-kun7.onrender.com/${
                             row.profile
                           }?t=${new Date().getTime()}`
                         : "/man.jpg"

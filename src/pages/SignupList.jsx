@@ -39,7 +39,7 @@ function SignupList({ setIsAuthenticated }) {
   useEffect(() => {
     setLoading(true);
     axios
-      .get("http://localhost:3939/get-user-data")
+      .get("https://crud-node-kun7.onrender.com/get-user-data")
       .then((response) => {
         setRows(response.data); // Populate rows with user data
         setLoading(false);
@@ -82,7 +82,7 @@ function SignupList({ setIsAuthenticated }) {
       setLoading(true);
       axios
         .put(
-          `http://localhost:3939/update-user-data/${selectedRow._id}`,
+          `https://crud-node-kun7.onrender.com/update-user-data/${selectedRow._id}`,
           formData,
           {
             headers: { "Content-Type": "multipart/form-data" },
@@ -90,7 +90,7 @@ function SignupList({ setIsAuthenticated }) {
         )
         .then(() => {
           axios
-            .get("http://localhost:3939/get-user-data") // Fetch updated data
+            .get("https://crud-node-kun7.onrender.com/get-user-data") // Fetch updated data
             .then((response) => {
               setRows(response.data);
               toast.success("Updated successfully!");
@@ -125,7 +125,9 @@ function SignupList({ setIsAuthenticated }) {
     if (selectedId) {
       setLoading(true);
       axios
-        .delete(`http://localhost:3939/delete-user-data/${selectedId}`)
+        .delete(
+          `https://crud-node-kun7.onrender.com/delete-user-data/${selectedId}`
+        )
         .then(() => {
           setRows(rows.filter((row) => row._id !== selectedId));
           toast.success("Deleted successfully!");
@@ -195,7 +197,7 @@ function SignupList({ setIsAuthenticated }) {
                     src={
                       row.imageUrl
                         ? `${row.imageUrl}?t=${new Date().getTime()}`
-                        : `http://localhost:3939/${
+                        : `https://crud-node-kun7.onrender.com/${
                             row.image
                           }?t=${new Date().getTime()}`
                     }

@@ -39,7 +39,7 @@ const Login = ({ setIsAuthenticated, setUserData }) => {
 
     try {
       const response = await fetch(
-        "http://localhost:3939/user-login",
+        "https://crud-node-kun7.onrender.com/user-login",
         {
           method: "POST",
           headers: {
@@ -54,7 +54,7 @@ const Login = ({ setIsAuthenticated, setUserData }) => {
         setIsAuthenticated(true);
         setUserData(result.user.image); // Store user data in the parent state
         toast.success("Login successful!");
-        localStorage.setItem('UserDetails', JSON.stringify(result.user));
+        localStorage.setItem("UserDetails", JSON.stringify(result.user));
         setTimeout(() => {
           navigate("/Student-list");
         }, 2000);
