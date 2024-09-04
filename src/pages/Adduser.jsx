@@ -4,6 +4,7 @@ import Select from 'react-select';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; // Import the CSS
+import ScaleLoader from 'react-spinners/ScaleLoader'; // Import the spinner component
 
 function Adduser({ setIsAuthenticated }) {
     const [inputdata, setInputData] = useState({
@@ -28,7 +29,7 @@ function Adduser({ setIsAuthenticated }) {
     const setInputValue = (e) => {
         const { name, value } = e.target;
         setInputData({ ...inputdata, [name]: value });
-    
+
         // Clear specific form error when the input value is valid
         if (formErrors[name]) {
             const updatedErrors = { ...formErrors };
@@ -36,11 +37,10 @@ function Adduser({ setIsAuthenticated }) {
             setFormErrors(updatedErrors);
         }
     };
-    
 
     const setStatusValue = (selectedOption) => {
         setStatus(selectedOption);
-    
+
         // Clear status error when it's selected
         if (formErrors.status) {
             const updatedErrors = { ...formErrors };
@@ -67,7 +67,7 @@ function Adduser({ setIsAuthenticated }) {
         if (!gender) errors.gender = 'Gender is required.';
         if (!location) errors.location = 'Location is required.';
         if (!status) errors.status = 'Status is required.';
-        
+
         setFormErrors(errors);
 
         return Object.keys(errors).length === 0;
@@ -91,7 +91,7 @@ function Adduser({ setIsAuthenticated }) {
         if (profile) formData.append('profile', profile);
 
         try {
-            const response = await axios.post('https://crud-node-kun7.onrender.com/Add-student', formData, {
+            const response = await axios.post('http://localhost:3939/Add-student', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -125,9 +125,28 @@ function Adduser({ setIsAuthenticated }) {
     return (
         <div className="container">
             <h2 className='text-center mt-1'>Register Student Details</h2>
-            <Card className='shadow mt-3 p-3'>
+            <Card className='shadow mt-3 p-3' style={{ position: 'relative' }}>
+                {/* Spinner Overlay */}
+                {loading && (
+                    <div
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            backgroundColor: 'rgba(255, 255, 255, 0.8)', // Slightly opaque white overlay
+                            zIndex: 10,
+                        }}
+                    >
+                        <ScaleLoader color="#36d7b7" />
+                    </div>
+                )}
                 <div className="profile_div text-center">
-                    <img src={preview} alt="Profile" style={{ width: '100px', height: '65px', borderRadius: '50%' }} />
+                    <img src={preview} alt="Profile" style={{ width: '100px', height: '55px', borderRadius: '50%' }} />
                 </div>
 
                 <Form onSubmit={submitUserData}>

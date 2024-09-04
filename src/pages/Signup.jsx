@@ -2,10 +2,10 @@ import { Button, Avatar, Box } from '@mui/material';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
+import ScaleLoader from 'react-spinners/ScaleLoader';
 
 const Signup = ({ setUserImage }) => {
   const navigate = useNavigate();
-
   const [formData, setFormData] = useState({
     name: "",
     username: "",
@@ -22,9 +22,10 @@ const Signup = ({ setUserImage }) => {
     password: "",
   });
 
+  const [loading, setLoading] = useState(false); // Loader state
+
   const handleChange = (event) => {
     const { name, value, files } = event.target;
-
     if (name === "image" && files) {
       setFormData((prevState) => ({
         ...prevState,
@@ -36,7 +37,6 @@ const Signup = ({ setUserImage }) => {
         ...prevState,
         [name]: value,
       }));
-      // Clear error for the input field being updated
       if (value.trim() !== "") {
         setErrors((prevErrors) => ({
           ...prevErrors,
@@ -71,8 +71,10 @@ const Signup = ({ setUserImage }) => {
       formDataToSend.append(key, formData[key]);
     }
 
+    setLoading(true); // Show loader
+
     try {
-      const response = await fetch('https://crud-node-kun7.onrender.com/user-signup', {
+      const response = await fetch('http://localhost:3939/user-signup', {
         method: 'POST',
         body: formDataToSend,
       });
@@ -89,22 +91,53 @@ const Signup = ({ setUserImage }) => {
       }
     } catch (error) {
       toast.error('Signup Failed!');
+    } finally {
+      setLoading(false); // Hide loader
     }
   };
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 150px)' }}>
-      <form onSubmit={handleSubmit} style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '8px', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)', width: '100%', maxWidth: '400px' }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 150px)', position: 'relative' }}>
+      {loading && (
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "rgba(255, 255, 255, 0.7)", // Light overlay while loading
+            zIndex: 10,
+          }}
+        >
+          <ScaleLoader color="#36d7b7" />
+        </div>
+      )}
+
+      <form
+        onSubmit={handleSubmit}
+        style={{
+          backgroundColor: 'white',
+          padding: '2rem',
+          borderRadius: '8px',
+          boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
+          width: '100%',
+          maxWidth: '400px',
+          filter: loading ? "blur(3px)" : "none", // Blur when loading
+          transition: "filter 0.3s ease",
+        }}
+      >
         <h4 className='text-center mt-2'>Sign Up Here</h4>
         {imagePreview && (
-            <Box display="flex" justifyContent="center" mt={2}>
-              <Avatar src={imagePreview} alt="Image Preview" sx={{ width: 100, height: 100 }} />
-            </Box>
-          )}
+          <Box display="flex" justifyContent="center" mt={2}>
+            <Avatar src={imagePreview} alt="Image Preview" sx={{ width: 100, height: 100 }} />
+          </Box>
+        )}
         <div className="mb-3">
-          <label htmlFor="name" className="form-label">
-            Full Name <span style={{ color: 'red' }}>*</span>
-          </label>
+          <label htmlFor="name" className="form-label">Full Name <span style={{ color: 'red' }}>*</span></label>
           <input
             type="text"
             className="form-control"
@@ -116,10 +149,8 @@ const Signup = ({ setUserImage }) => {
             style={{ marginBottom: '1rem', borderColor: errors.name ? 'red' : '' }}
           />
         </div>
-        <div className="mb-3 mt-4">
-          <label htmlFor="username" className="form-label">
-            Email address <span style={{ color: 'red' }}>*</span>
-          </label>
+        <div className="mb-3">
+          <label htmlFor="username" className="form-label">Email address <span style={{ color: 'red' }}>*</span></label>
           <input
             type="email"
             className="form-control"
@@ -132,9 +163,7 @@ const Signup = ({ setUserImage }) => {
           />
         </div>
         <div className="mb-3">
-          <label htmlFor="contact" className="form-label">
-            Contact No <span style={{ color: 'red' }}>*</span>
-          </label>
+          <label htmlFor="contact" className="form-label">Contact No <span style={{ color: 'red' }}>*</span></label>
           <input
             type="number"
             className="form-control"
@@ -147,9 +176,7 @@ const Signup = ({ setUserImage }) => {
           />
         </div>
         <div className="mb-3">
-          <label htmlFor="password" className="form-label">
-            Password <span style={{ color: 'red' }}>*</span>
-          </label>
+          <label htmlFor="password" className="form-label">Password <span style={{ color: 'red' }}>*</span></label>
           <input
             type="password"
             className="form-control"
@@ -179,7 +206,8 @@ const Signup = ({ setUserImage }) => {
           Have an account? <Link to="/login">Create One</Link>
         </div>
       </form>
-      <ToastContainer position="top-right" autoClose={2000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="light" /> 
+
+      <ToastContainer position="top-right" autoClose={2000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="light" />
     </div>
   );
 };

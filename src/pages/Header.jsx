@@ -18,6 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import HomeIcon from '@mui/icons-material/Home';
 import AddIcon from '@mui/icons-material/Add';
 import LoginIcon from '@mui/icons-material/Login';
+import ProfileCard from './ProfileCard'; // Import ProfileCard component
 
 const settings = [
   { label: 'Profile', icon: <PersonIcon /> },
@@ -30,6 +31,7 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
 
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [profileCardOpen, setProfileCardOpen] = useState(false);
 
   useEffect(() => {
     if (userData) {
@@ -42,9 +44,9 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
-  const handleOpenUser = ()=>{
+  const handleOpenUser = () => {
     navigate('/Signup-list');
-  }
+  };
   const handleOpenAdUser = () => {
     navigate('/Adduser');
   };
@@ -66,7 +68,12 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
     }
   };
 
-  const baseURL = 'https://crud-node-kun7.onrender.com/';
+  const baseURL = 'http://localhost:3939/';
+
+  const handleProfileUpdate = (updatedData) => {
+    console.log('Updated profile data:', updatedData);
+    // Handle the update logic here
+  };
 
   return (
     <nav className="navbar bg-body-tertiary">
@@ -92,19 +99,17 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
           <span style={{ fontWeight: 'bold', fontSize: '1.5rem' }}>SMS</span>
         </NavLink>
 
-
-
         {/* Home Button */}
         {(location.pathname === '/Adduser' || location.pathname === '/Signup-list') && (
-            <Button
-              variant="contained"
-              startIcon={<HomeIcon />}
-              sx={{ marginLeft: 'auto', marginRight: '1rem' }}
-              onClick={() => navigate('/Student-list')}
-            >
-              Home
-            </Button>
-          )}
+          <Button
+            variant="contained"
+            startIcon={<HomeIcon />}
+            sx={{ marginLeft: 'auto', marginRight: '1rem' }}
+            onClick={() => navigate('/Student-list')}
+          >
+            Home
+          </Button>
+        )}
 
         {location.pathname === '/' && (
           <Button
@@ -145,7 +150,7 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
               }}
               sx={{ marginRight: '1rem' }}
             />
-                 <Button
+            <Button
               onClick={handleOpenUser}
               sx={{ marginRight: '1rem' }}
               variant="contained"
@@ -163,14 +168,15 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
             </Button>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar
-                  src={
-                    storedUserData 
-                      ? `${baseURL}${storedUserData}?t=${new Date().getTime()}`
-                      : '/man.png'
-                  }
-                  alt="User Avatar"
-                />
+              <Avatar
+  src={
+    storedUserData
+      ? `${baseURL}${storedUserData}?t=${new Date().getTime()}`
+      : '/man.png'
+  }
+  alt="User Avatar"
+/>
+
               </IconButton>
             </Tooltip>
             <Menu
@@ -195,6 +201,8 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
                   onClick={() => {
                     if (setting.label === 'Logout') {
                       handleLogout();
+                    } else if (setting.label === 'Profile') {
+                      setProfileCardOpen(true);
                     }
                     handleCloseUserMenu();
                   }}
@@ -207,6 +215,13 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
           </Box>
         )}
       </div>
+
+      <ProfileCard
+        open={profileCardOpen}
+        onClose={() => setProfileCardOpen(false)}
+        userData={storedUserData}
+        onUpdate={handleProfileUpdate}
+      />
     </nav>
   );
 }

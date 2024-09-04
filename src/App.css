@@ -35,3 +35,9 @@
   border-radius: 50%;
   border: 1px solid #111;
 }
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
