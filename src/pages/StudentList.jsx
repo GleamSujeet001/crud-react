@@ -43,7 +43,7 @@ import ScaleLoader from "react-spinners/ScaleLoader";
 function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
   const [rows, setRows] = useState([]);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(9);
   const [open, setOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [viewMode, setViewMode] = useState("list");
@@ -51,7 +51,8 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
   const [selectedRow, setSelectedRow] = useState(null);
   const [filteredRows, setFilteredRows] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const token = localStorage.getItem("token");
+  const [filterStatus, setFilterStatus] = useState("All");
   const [editData, setEditData] = useState({
     fname: "",
     lname: "",
@@ -67,22 +68,18 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
     { value: "Active", label: "Active" },
     { value: "Inactive", label: "Inactive" },
   ];
-  useEffect(() => {
-    const filtered = rows.filter(
-      (row) =>
-        row.fname.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        row.lname.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        row.email.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setFilteredRows(filtered);
-  }, [searchQuery, rows]);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true); // Start loader before fetching data
       try {
         const response = await axios.get(
-          "https://crud-node-kun7.onrender.com/get-student-data"
+          "http://localhost:3939/get-student-data",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Include token in the request
+            },
+          }
         );
         setRows(response.data);
         setFilteredRows(response.data);
@@ -96,6 +93,30 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
     fetchData();
   }, [setUserImage]);
 
+  useEffect(() => {
+    const applyFilters = () => {
+      let filtered = rows;
+
+      // Apply search query filter
+      if (searchQuery) {
+        filtered = filtered.filter(
+          (row) =>
+            row.fname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            row.lname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            row.email.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      }
+
+      // Apply status filter
+      if (filterStatus !== "All") {
+        filtered = filtered.filter((row) => row.status === filterStatus);
+      }
+
+      setFilteredRows(filtered);
+    };
+
+    applyFilters();
+  }, [searchQuery, filterStatus, rows]);
   const handleEdit = (row) => {
     setSelectedRow(row);
     setEditData({
@@ -142,14 +163,22 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
 
       try {
         await axios.put(
-          `https://crud-node-kun7.onrender.com/update-student-data/${selectedRow._id}`,
+          `http://localhost:3939/update-student-data/${selectedRow._id}`,
           formData,
           {
-            headers: { "Content-Type": "multipart/form-data" },
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
         const response = await axios.get(
-          "https://crud-node-kun7.onrender.com/get-student-data"
+          "http://localhost:3939/get-student-data",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Include token in the request
+            },
+          }
         );
         setRows(response.data);
         toast.success("Updated successfully!");
@@ -178,7 +207,12 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
     if (selectedId) {
       try {
         await axios.delete(
-          `https://crud-node-kun7.onrender.com/delete-student-data/${selectedId}`
+          `http://localhost:3939/delete-student-data/${selectedId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Include token in the request
+            },
+          }
         );
         setRows(rows.filter((row) => row._id !== selectedId));
         toast.success("Deleted successfully!");
@@ -196,6 +230,9 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
     setPage(newPage);
   };
 
+  const handleFilterChange = (event) => {
+    setFilterStatus(event.target.value);
+  };
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
@@ -221,23 +258,36 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
           <ScaleLoader color="#36d7b7" />
         </div>
       )}
-      <Box sx={{ mb: 2, display: "flex", justifyContent: "flex-end" }}>
-        <IconButton
-          aria-label="list view"
-          color={viewMode === "list" ? "primary" : "default"}
-          onClick={() => setViewMode("list")}
-        >
-          <ViewListIcon />
-        </IconButton>
-        <IconButton
-          aria-label="card view"
-          color={viewMode === "card" ? "primary" : "default"}
-          onClick={() => setViewMode("card")}
-        >
-          <ViewModuleIcon />
-        </IconButton>
-      </Box>
 
+      <Box sx={{ mb: 2, display: "flex", justifyContent: "flex-end" }}>
+        <Select
+          sx={{ marginRight: "1rem" }}
+          value={filterStatus}
+          label="Status"
+          onChange={(e) => setFilterStatus(e.target.value)}
+        >
+          <MenuItem value="All">All</MenuItem>
+          <MenuItem value="Active">Active</MenuItem>
+          <MenuItem value="Inactive">Inactive</MenuItem>
+        </Select>
+
+        <Box>
+          <IconButton
+            aria-label="list view"
+            color={viewMode === "list" ? "primary" : "default"}
+            onClick={() => setViewMode("list")}
+          >
+            <ViewListIcon />
+          </IconButton>
+          <IconButton
+            aria-label="card view"
+            color={viewMode === "card" ? "primary" : "default"}
+            onClick={() => setViewMode("card")}
+          >
+            <ViewModuleIcon />
+          </IconButton>
+        </Box>
+      </Box>
       {viewMode === "list" ? (
         <TableContainer
           component={Paper}
@@ -248,6 +298,9 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
               <TableRow>
                 <TableCell align="center">
                   <strong>S.no</strong>
+                </TableCell>
+                <TableCell align="center">
+                  <strong>Profile</strong>
                 </TableCell>
                 <TableCell align="center">
                   <strong>Name</strong>
@@ -267,9 +320,7 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
                 <TableCell align="center">
                   <strong>Location</strong>
                 </TableCell>
-                <TableCell align="center">
-                  <strong>Profile</strong>
-                </TableCell>
+
                 <TableCell align="center">
                   <strong>Action</strong>
                 </TableCell>
@@ -290,6 +341,18 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
                       {index + 1 + page * rowsPerPage}
                     </TableCell>
                     <TableCell align="center">
+                      <Avatar
+                        alt={row.fname}
+                        src={
+                          row.profile
+                            ? `http://localhost:3939/${
+                                row.profile
+                              }?t=${new Date().getTime()}`
+                            : "/man.png"
+                        }
+                      />
+                    </TableCell>
+                    <TableCell align="center">
                       {row.fname} {row.lname}
                     </TableCell>
                     <TableCell align="center">{row.email}</TableCell>
@@ -305,18 +368,7 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
                       </span>
                     </TableCell>
                     <TableCell align="center">{row.location}</TableCell>
-                    <TableCell align="center">
-                      <Avatar
-                        alt={row.fname}
-                        src={
-                          row.profile
-                            ? `https://crud-node-kun7.onrender.com/${
-                                row.profile
-                              }?t=${new Date().getTime()}`
-                            : "/man.png"
-                        }
-                      />
-                    </TableCell>
+
                     <TableCell align="center">
                       <IconButton
                         aria-label="edit"
@@ -344,7 +396,6 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
             onPageChange={handleChangePage}
             rowsPerPage={rowsPerPage}
             onRowsPerPageChange={handleChangeRowsPerPage}
-            rowsPerPageOptions={[5, 10]}
           />
         </TableContainer>
       ) : (
@@ -358,7 +409,7 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
                     height: 140, // Set a fixed height for the image container
                     backgroundImage: `url(${
                       row.profile
-                        ? `https://crud-node-kun7.onrender.com/${
+                        ? `http://localhost:3939/${
                             row.profile
                           }?t=${new Date().getTime()}`
                         : "/man.jpg"

@@ -29,7 +29,8 @@ const StyledAvatar = styled(Avatar)({
   boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
 });
 
-const baseURL = "https://crud-node-kun7.onrender.com/";
+const baseURL = "http://localhost:3939/";
+const token = localStorage.getItem('token');
 
 const ProfileCard = ({ open, onClose, onUpdate }) => {
   const [oldPassword, setOldPassword] = useState("");
@@ -71,6 +72,10 @@ const ProfileCard = ({ open, onClose, onUpdate }) => {
         oldPassword,
         newPassword,
         userData,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
       });
 
       if (response.status === 200) {

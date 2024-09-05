@@ -41,3 +41,13 @@
   align-items: center;
   height: 100vh;
 }
+/* Add this to your CSS file or inside a <style> tag in your component */
+
+@media (max-width: 600px) {
+  .hide-text {
+    display: none;
+  }
+}
+.css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input {
+  padding: 0px 30px !important;
+}

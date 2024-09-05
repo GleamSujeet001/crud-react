@@ -92,11 +92,11 @@ function Adduser({ setIsAuthenticated }) {
 
     try {
       const response = await axios.post(
-        "https://crud-node-kun7.onrender.com/Add-student",
+        "http://localhost:3939/Add-student",
         formData,
         {
           headers: {
-            "Content-Type": "multipart/form-data",
+            "Content-Type": "multipart/form-data",Authorization: `Bearer ${token}`
           },
         }
       );

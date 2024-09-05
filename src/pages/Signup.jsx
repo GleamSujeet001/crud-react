@@ -75,13 +75,10 @@ const Signup = ({ setUserImage }) => {
     setLoading(true); // Show loader
 
     try {
-      const response = await fetch(
-        "https://crud-node-kun7.onrender.com/user-signup",
-        {
-          method: "POST",
-          body: formDataToSend,
-        }
-      );
+      const response = await fetch("http://localhost:3939/user-signup", {
+        method: "POST",
+        body: formDataToSend,
+      });
 
       if (response.ok) {
         const result = await response.json();

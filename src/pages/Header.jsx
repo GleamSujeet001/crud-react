@@ -69,7 +69,7 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
     }
   };
 
-  const baseURL = "https://crud-node-kun7.onrender.com/";
+  const baseURL = "http://localhost:3939/";
 
   const handleProfileUpdate = (updatedData) => {
     console.log("Updated profile data:", updatedData);
@@ -90,7 +90,7 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
           }}
         >
           <img
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSzpExVyX0u7sbSBpSxVdui50mn1_slr9JXTw&s"
+            src="/logo1.png"
             alt="Logo"
             width="40"
             height="35"
@@ -109,7 +109,7 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
             sx={{ marginLeft: "auto", marginRight: "1rem" }}
             onClick={() => navigate("/Student-list")}
           >
-            Home
+            <span className="hide-text">Home</span>
           </Button>
         )}
 
@@ -120,7 +120,7 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
             sx={{ marginLeft: "auto", marginRight: "1rem" }}
             onClick={() => navigate("/login")}
           >
-            Login
+            <span className="hide-text">Login</span>
           </Button>
         )}
         {location.pathname === "/login" && (
@@ -130,7 +130,7 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
             sx={{ marginLeft: "auto", marginRight: "1rem" }}
             onClick={() => navigate("/")}
           >
-            Signup
+            <span className="hide-text">Signup</span>
           </Button>
         )}
         {/* Conditionally render avatar only on /signup-list or /Student-list */}
@@ -158,7 +158,7 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
               variant="contained"
               startIcon={<PersonIcon />}
             >
-              All Users
+              <span className="hide-text">All Users</span>
             </Button>
             <Button
               onClick={handleOpenAdUser}
@@ -166,7 +166,7 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
               variant="contained"
               startIcon={<AddIcon />}
             >
-              Add Students
+              <span className="hide-text">Add Students</span>
             </Button>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>

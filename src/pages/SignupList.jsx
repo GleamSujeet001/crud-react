@@ -34,12 +34,16 @@ function SignupList({ setIsAuthenticated }) {
     image: null,
   });
   const [loading, setLoading] = useState(false);
-
+  const token = localStorage.getItem("token");
   // Fetch users on component mount
   useEffect(() => {
     setLoading(true);
     axios
-      .get("https://crud-node-kun7.onrender.com/get-user-data")
+      .get("http://localhost:3939/get-user-data", {
+        headers: {
+          Authorization: `Bearer ${token}`, // Include token in the request
+        },
+      })
       .then((response) => {
         setRows(response.data); // Populate rows with user data
         setLoading(false);
@@ -82,15 +86,22 @@ function SignupList({ setIsAuthenticated }) {
       setLoading(true);
       axios
         .put(
-          `https://crud-node-kun7.onrender.com/update-user-data/${selectedRow._id}`,
+          `http://localhost:3939/update-user-data/${selectedRow._id}`,
           formData,
           {
-            headers: { "Content-Type": "multipart/form-data" },
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${token}`,
+            },
           }
         )
         .then(() => {
           axios
-            .get("https://crud-node-kun7.onrender.com/get-user-data") // Fetch updated data
+            .get("http://localhost:3939/get-user-data", {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            })
             .then((response) => {
               setRows(response.data);
               toast.success("Updated successfully!");
@@ -125,9 +136,11 @@ function SignupList({ setIsAuthenticated }) {
     if (selectedId) {
       setLoading(true);
       axios
-        .delete(
-          `https://crud-node-kun7.onrender.com/delete-user-data/${selectedId}`
-        )
+        .delete(`http://localhost:3939/delete-user-data/${selectedId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
         .then(() => {
           setRows(rows.filter((row) => row._id !== selectedId));
           toast.success("Deleted successfully!");
@@ -148,7 +161,7 @@ function SignupList({ setIsAuthenticated }) {
   });
 
   return (
-    <div style={{ position: "relative" }}>
+    <div>
       {loading && (
         <div
           style={{
@@ -172,10 +185,11 @@ function SignupList({ setIsAuthenticated }) {
           <TableHead>
             <TableRow>
               <TableCell>S.no</TableCell>
+              <TableCell>Profile</TableCell>
               <TableCell>Name</TableCell>
               <TableCell>UserName</TableCell>
               <TableCell>Contact</TableCell>
-              <TableCell>Profile</TableCell>
+
               <TableCell>Action</TableCell>
             </TableRow>
           </TableHead>
@@ -188,21 +202,22 @@ function SignupList({ setIsAuthenticated }) {
                 <TableCell component="th" scope="row">
                   {index + 1}
                 </TableCell>
-                <TableCell>{row.name}</TableCell>
-                <TableCell>{row.username}</TableCell>
-                <TableCell>{row.contact}</TableCell>
                 <TableCell>
                   <Avatar
                     alt={row.name}
                     src={
                       row.imageUrl
                         ? `${row.imageUrl}?t=${new Date().getTime()}`
-                        : `https://crud-node-kun7.onrender.com/${
+                        : `http://localhost:3939/${
                             row.image
                           }?t=${new Date().getTime()}`
                     }
                   />
                 </TableCell>
+                <TableCell>{row.name}</TableCell>
+                <TableCell>{row.username}</TableCell>
+                <TableCell>{row.contact}</TableCell>
+
                 <TableCell>
                   <IconButton
                     aria-label="edit"
