@@ -259,7 +259,7 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
         </div>
       )}
 
-      <Box sx={{ mb: 2, display: "flex", justifyContent: "flex-end" }}>
+      <Box className="StatusDropDown" sx={{ mb: 2, display: "flex", justifyContent: "flex-end" }}>
         <Select
           sx={{ marginRight: "1rem" }}
           value={filterStatus}
