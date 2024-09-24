@@ -18,8 +18,10 @@ import { useNavigate } from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
 import AddIcon from "@mui/icons-material/Add";
 import LoginIcon from "@mui/icons-material/Login";
-import ProfileCard from "./ProfileCard"; // Import ProfileCard component
-
+import ProfileCard from "./ProfileCard"; 
+import GroupIcon from "@mui/icons-material/Group";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import ChatIcon from "@mui/icons-material/Chat";
 const settings = [
   { label: "Profile", icon: <PersonIcon /> },
   { label: "Logout", icon: <LogoutIcon /> },
@@ -46,10 +48,13 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
     setAnchorElUser(event.currentTarget);
   };
   const handleOpenUser = () => {
-    navigate("/Signup-list");
+    navigate("/signup-list");
+  };
+  const handleOpenChat = () => {
+    navigate("/user-chat");
   };
   const handleOpenAdUser = () => {
-    navigate("/Adduser");
+    navigate("/adduser");
   };
 
   const handleCloseUserMenu = () => {
@@ -59,13 +64,16 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
   const handleLogout = () => {
     setIsAuthenticated(false);
     localStorage.removeItem("userData");
+    localStorage.removeItem("UserDetails");
+    localStorage.removeItem("token");
+    localStorage.removeItem("isAuthenticated");
     navigate("/login");
   };
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
     if (onSearch) {
-      onSearch(event.target.value); // Call the search function passed as a prop
+      onSearch(event.target.value); 
     }
   };
 
@@ -73,7 +81,6 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
 
   const handleProfileUpdate = (updatedData) => {
     console.log("Updated profile data:", updatedData);
-    // Handle the update logic here
   };
 
   return (
@@ -81,7 +88,7 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
       <div className="container-fluid">
         <NavLink
           className="navbar-brand"
-          to="/Student-list"
+          to="/student-list"
           style={{
             marginLeft: "3rem",
             display: "flex",
@@ -100,18 +107,18 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
           <span style={{ fontWeight: "bold", fontSize: "1.5rem" }}>SMS</span>
         </NavLink>
 
-        {/* Home Button */}
-        {(location.pathname === "/Adduser" ||
-          location.pathname === "/Signup-list") && (
-          <Button
-            variant="contained"
-            startIcon={<HomeIcon />}
-            sx={{ marginLeft: "auto", marginRight: "1rem" }}
-            onClick={() => navigate("/Student-list")}
-          >
-            <span className="hide-text">Home</span>
-          </Button>
-        )}
+        {location.pathname != "/" &&
+          location.pathname != "/login" &&
+          location.pathname != "/student-list" && (
+            <Button
+              variant="contained"
+              startIcon={<HomeIcon />}
+              sx={{ marginLeft: "auto", marginRight: "1rem" }}
+              onClick={() => navigate("/student-list")}
+            >
+              <span className="hide-text">Home</span>
+            </Button>
+          )}
 
         {location.pathname === "/" && (
           <Button
@@ -133,9 +140,9 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
             <span className="hide-text">Signup</span>
           </Button>
         )}
-        {/* Conditionally render avatar only on /signup-list or /Student-list */}
-        {location.pathname === "/Student-list" && (
-          <Box sx={{ flexGrow: 0, display: "flex", alignItems: "center" }}>
+
+        <Box sx={{ flexGrow: 0, display: "flex", alignItems: "center" }}>
+          {location.pathname === "/student-list" && (
             <TextField
               variant="outlined"
               size="small"
@@ -152,69 +159,101 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
               }}
               sx={{ marginRight: "1rem" }}
             />
-            <Button
-              onClick={handleOpenUser}
-              sx={{ marginRight: "1rem" }}
-              variant="contained"
-              startIcon={<PersonIcon />}
-            >
-              <span className="hide-text">All Users</span>
-            </Button>
-            <Button
-              onClick={handleOpenAdUser}
-              sx={{ marginRight: "1rem" }}
-              variant="contained"
-              startIcon={<AddIcon />}
-            >
-              <span className="hide-text">Add Students</span>
-            </Button>
-            <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar
-                  src={
-                    storedUserData
-                      ? `${baseURL}${storedUserData}?t=${new Date().getTime()}`
-                      : "/man.png"
-                  }
-                  alt="User Avatar"
-                />
-              </IconButton>
-            </Tooltip>
-            <Menu
-              sx={{ mt: "45px" }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
-            >
-              {settings.map((setting, index) => (
-                <MenuItem
-                  key={index}
-                  onClick={() => {
-                    if (setting.label === "Logout") {
-                      handleLogout();
-                    } else if (setting.label === "Profile") {
-                      setProfileCardOpen(true);
+          )}
+          {location.pathname != "/" && location.pathname != "/login" && (
+            <Box>
+              {location.pathname != "/user-chat" && (
+                <Tooltip title="Chat">
+                  <IconButton
+                    sx={{
+                      backgroundColor: "#1976d2",
+                      borderRadius: "50%",
+                      marginRight: "1rem",
+                    }}
+                    onClick={handleOpenChat}
+                  >
+                    <ChatIcon sx={{ color: "#fff" }} />
+                  </IconButton>
+                </Tooltip>
+              )}
+              {location.pathname != "/signup-list" && (
+                <Tooltip title="All Users">
+                  <IconButton
+                    sx={{
+                      backgroundColor: "#1976d2",
+                      borderRadius: "50%",
+                      marginRight: "1rem",
+                    }}
+                    onClick={handleOpenUser}
+                  >
+                    <GroupIcon sx={{ color: "#fff" }} />
+                  </IconButton>
+                </Tooltip>
+              )}
+
+              {location.pathname != "/adduser" && (
+                <Tooltip title="Add Client">
+                  <IconButton
+                    sx={{
+                      backgroundColor: "#1976d2",
+                      borderRadius: "50%",
+                      marginRight: "1rem",
+                    }}
+                    onClick={handleOpenAdUser}
+                  >
+                    <PersonAddIcon sx={{ color: "#fff" }} />
+                  </IconButton>
+                </Tooltip>
+              )}
+
+              <Tooltip title="Open settings">
+                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  <Avatar
+                    src={
+                      storedUserData
+                        ? `${baseURL}${storedUserData}?t=${new Date().getTime()}`
+                        : "/man.png"
                     }
-                    handleCloseUserMenu();
-                  }}
-                >
-                  <ListItemIcon>{setting.icon}</ListItemIcon>
-                  <Typography textAlign="center">{setting.label}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
-        )}
+                    alt="User Avatar"
+                  />
+                </IconButton>
+              </Tooltip>
+              <Menu
+                sx={{ mt: "45px" }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+              >
+                {settings.map((setting, index) => (
+                  <MenuItem
+                    key={index}
+                    onClick={() => {
+                      if (setting.label === "Logout") {
+                        handleLogout();
+                      } else if (setting.label === "Profile") {
+                        setProfileCardOpen(true);
+                      }
+                      handleCloseUserMenu();
+                    }}
+                  >
+                    <ListItemIcon>{setting.icon}</ListItemIcon>
+                    <Typography textAlign="center">{setting.label}</Typography>
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
+          )}
+        </Box>
       </div>
 
       <ProfileCard

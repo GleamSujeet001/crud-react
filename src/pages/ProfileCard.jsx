@@ -9,7 +9,7 @@ import {
   Button,
   Dialog,
 } from "@mui/material";
-import { styled } from "@mui/system";
+import { styled } from '@mui/material/styles';
 import axios from "axios";
 import { toast } from "react-toastify";
 
@@ -30,7 +30,7 @@ const StyledAvatar = styled(Avatar)({
 });
 
 const baseURL = "http://localhost:3939/";
-const token = localStorage.getItem('token');
+const token = localStorage.getItem("token");
 
 const ProfileCard = ({ open, onClose, onUpdate }) => {
   const [oldPassword, setOldPassword] = useState("");
@@ -68,15 +68,20 @@ const ProfileCard = ({ open, onClose, onUpdate }) => {
     }
 
     try {
-      const response = await axios.post(`${baseURL}user-change-password`, {
-        oldPassword,
-        newPassword,
-        userData,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+      const response = await axios.post(
+        `${baseURL}user-change-password`,
+        {
+          oldPassword,
+          newPassword,
+          userData,
         },
-      });
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (response.status === 200) {
         onUpdate();
@@ -88,11 +93,15 @@ const ProfileCard = ({ open, onClose, onUpdate }) => {
         onClose();
       }
     } catch (error) {
-      // Check if the error response contains a custom message from the API
-      const errorMessage =
-        error.response?.data?.message ||
-        "Failed to update the password. Please try again.";
-      toast.error(errorMessage);
+      if (error.response) {
+        const errorMessage =
+          error.response.data?.message || "Failed to update the password.";
+        toast.error(errorMessage);
+      } else if (error.request) {
+        toast.error("No response from the server. Please try again later.");
+      } else {
+        toast.error("An unexpected error occurred. Please try again.");
+      }
     }
   };
 

@@ -3,8 +3,10 @@ import { Card, Form, Row, Button } from "react-bootstrap";
 import Select from "react-select";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"; // Import the CSS
-import ScaleLoader from "react-spinners/ScaleLoader"; // Import the spinner component
+import "react-toastify/dist/ReactToastify.css";
+import ScaleLoader from "react-spinners/ScaleLoader"; 
+const token = localStorage.getItem("token");
+const UserDetails = JSON.parse(localStorage.getItem("UserDetails"));
 
 function Adduser({ setIsAuthenticated }) {
   const [inputdata, setInputData] = useState({
@@ -16,7 +18,7 @@ function Adduser({ setIsAuthenticated }) {
     location: "",
   });
   const [status, setStatus] = useState(null);
-  const [preview, setPreview] = useState("man.jpg"); // Default avatar
+  const [preview, setPreview] = useState("man.jpg"); 
   const [profile, setProfileState] = useState(null);
   const [loading, setLoading] = useState(false);
   const [formErrors, setFormErrors] = useState({});
@@ -29,8 +31,6 @@ function Adduser({ setIsAuthenticated }) {
   const setInputValue = (e) => {
     const { name, value } = e.target;
     setInputData({ ...inputdata, [name]: value });
-
-    // Clear specific form error when the input value is valid
     if (formErrors[name]) {
       const updatedErrors = { ...formErrors };
       delete updatedErrors[name];
@@ -40,8 +40,6 @@ function Adduser({ setIsAuthenticated }) {
 
   const setStatusValue = (selectedOption) => {
     setStatus(selectedOption);
-
-    // Clear status error when it's selected
     if (formErrors.status) {
       const updatedErrors = { ...formErrors };
       delete updatedErrors.status;
@@ -88,6 +86,7 @@ function Adduser({ setIsAuthenticated }) {
     formData.append("gender", inputdata.gender);
     formData.append("status", status ? status.value : "");
     formData.append("location", inputdata.location);
+    formData.append("parentsId", UserDetails._id);
     if (profile) formData.append("profile", profile);
 
     try {
@@ -96,7 +95,8 @@ function Adduser({ setIsAuthenticated }) {
         formData,
         {
           headers: {
-            "Content-Type": "multipart/form-data",Authorization: `Bearer ${token}`
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -112,14 +112,13 @@ function Adduser({ setIsAuthenticated }) {
           location: "",
         });
         setProfileState(null);
-        setPreview("man.jpg"); // Reset preview
+        setPreview("man.jpg"); 
         setStatus(null);
         setFormErrors({});
       } else {
         toast.error("Registration failed!");
       }
     } catch (error) {
-      console.error("There was an error submitting the form", error);
       toast.error("Submission failed!");
     } finally {
       setLoading(false);
@@ -130,7 +129,6 @@ function Adduser({ setIsAuthenticated }) {
     <div className="container">
       <h2 className="text-center mt-1">Register Student Details</h2>
       <Card className="shadow mt-3 p-3" style={{ position: "relative" }}>
-        {/* Spinner Overlay */}
         {loading && (
           <div
             style={{
@@ -142,7 +140,7 @@ function Adduser({ setIsAuthenticated }) {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              backgroundColor: "rgba(255, 255, 255, 0.8)", // Slightly opaque white overlay
+              backgroundColor: "rgba(255, 255, 255, 0.8)", 
               zIndex: 10,
             }}
           >

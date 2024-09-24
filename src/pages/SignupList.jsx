@@ -7,21 +7,24 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import axios from "axios";
-import { IconButton, TextField } from "@mui/material";
+import {
+  IconButton,
+  TextField,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Slide,
+  Avatar,
+} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { ToastContainer, toast } from "react-toastify";
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import Slide from "@mui/material/Slide";
-import Avatar from "@mui/material/Avatar";
-import ScaleLoader from "react-spinners/ScaleLoader"; // Import the spinner component
+import ScaleLoader from "react-spinners/ScaleLoader";
 
-function SignupList({ setIsAuthenticated }) {
+function SignupList({ setIsAuthenticated , }) {
   const [rows, setRows] = useState([]);
   const [open, setOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -34,26 +37,48 @@ function SignupList({ setIsAuthenticated }) {
     image: null,
   });
   const [loading, setLoading] = useState(false);
+  const [userDetails, setUserDetails] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const token = localStorage.getItem("token");
-  // Fetch users on component mount
+
   useEffect(() => {
-    setLoading(true);
-    axios
-      .get("http://localhost:3939/get-user-data", {
-        headers: {
-          Authorization: `Bearer ${token}`, // Include token in the request
-        },
-      })
-      .then((response) => {
-        setRows(response.data); // Populate rows with user data
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching user data:", error);
-        toast.error("Error fetching user data");
-        setLoading(false);
-      });
+    const storedUserDetails = JSON.parse(localStorage.getItem("UserDetails"));
+    setUserDetails(storedUserDetails);
+    setIsAdmin(storedUserDetails?._id === "66dffe193dd605ebfff3190e");
   }, []);
+
+  useEffect(() => {
+    if (token) {
+      setLoading(true);
+      axios
+        .get("http://localhost:3939/get-user-data", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => {
+          const allRows = response.data;
+          const ownRow = allRows.filter(row => row._id === userDetails?._id);
+          const otherRows = allRows.filter(row => row._id !== userDetails?._id);
+          setRows([...ownRow, ...otherRows]);
+          setLoading(false);
+        })
+        .catch((error) => {
+          if (error.response && error.response.data.message === "Invalid token") {
+            toast.error("Session expired. Please log in again.");
+            localStorage.removeItem("userData");
+            localStorage.removeItem("UserDetails");
+            localStorage.removeItem("token");
+            localStorage.removeItem("isAuthenticated");
+            navigate("/login");
+          } else {
+            console.error("Error fetching data:", error);
+          }
+          setLoading(false);
+        });
+    }
+  }, [token, userDetails]);
+  
 
   const handleEdit = (row) => {
     setSelectedRow(row);
@@ -78,7 +103,6 @@ function SignupList({ setIsAuthenticated }) {
       formData.append("username", editData.username);
       formData.append("contact", editData.contact);
 
-      // Only append the new image if one is selected
       if (editData.image && editData.image !== selectedRow.image) {
         formData.append("image", editData.image);
       }
@@ -123,7 +147,7 @@ function SignupList({ setIsAuthenticated }) {
   };
 
   const handleClickOpen = (id) => {
-    setSelectedId(id); // Save the selected id for deletion
+    setSelectedId(id);
     setOpen(true);
   };
 
@@ -156,12 +180,9 @@ function SignupList({ setIsAuthenticated }) {
     }
   };
 
-  const Transition = React.forwardRef(function Transition(props, ref) {
-    return <Slide direction="up" ref={ref} {...props} />;
-  });
 
   return (
-    <div>
+    <div style={{ padding: "1rem" }}>
       {loading && (
         <div
           style={{
@@ -173,14 +194,17 @@ function SignupList({ setIsAuthenticated }) {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            backgroundColor: "rgba(255, 255, 255, 0.8)", // Slightly opaque white overlay
+            backgroundColor: "rgba(255, 255, 255, 0.8)",
             zIndex: 10,
           }}
         >
           <ScaleLoader color="#36d7b7" />
         </div>
       )}
-      <TableContainer component={Paper}>
+      <TableContainer
+        component={Paper}
+        style={{ width: "100%", maxWidth: "100%" }}
+      >
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
             <TableRow>
@@ -189,144 +213,140 @@ function SignupList({ setIsAuthenticated }) {
               <TableCell>Name</TableCell>
               <TableCell>UserName</TableCell>
               <TableCell>Contact</TableCell>
-
               <TableCell>Action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row, index) => (
-              <TableRow
-                key={row._id}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
-                  {index + 1}
-                </TableCell>
-                <TableCell>
-                  <Avatar
-                    alt={row.name}
-                    src={
-                      row.imageUrl
-                        ? `${row.imageUrl}?t=${new Date().getTime()}`
-                        : `http://localhost:3939/${
-                            row.image
-                          }?t=${new Date().getTime()}`
-                    }
-                  />
-                </TableCell>
-                <TableCell>{row.name}</TableCell>
-                <TableCell>{row.username}</TableCell>
-                <TableCell>{row.contact}</TableCell>
+            {rows.map((row, index) => {
+             
+              const isOwnRow = userDetails?._id === row._id;
 
-                <TableCell>
-                  <IconButton
-                    aria-label="edit"
-                    style={{ color: "blue" }}
-                    onClick={() => handleEdit(row)}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton
-                    aria-label="delete"
-                    style={{ color: "red" }}
-                    onClick={() => handleClickOpen(row._id)}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
+              return (
+                <TableRow key={row._id}>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>
+                    <Avatar
+                      alt={row.name}
+                      src={
+                        row.imageUrl
+                          ? `${row.imageUrl}?t=${new Date().getTime()}`
+                          : `http://localhost:3939/${
+                              row.image
+                            }?t=${new Date().getTime()}`
+                      }
+                      sx={{ width: "3rem", height: "3rem" }}
+                    />
+                  </TableCell>
+                  <TableCell>{row.name}</TableCell>
+                  <TableCell>{row.username}</TableCell>
+                  <TableCell>{row.contact}</TableCell>
+
+                  <TableCell>
+                    {isAdmin || isOwnRow ? (
+                      <IconButton
+                        aria-label="edit"
+                        style={{ color: "blue" }}
+                        onClick={() => handleEdit(row)}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                    ) : (
+                      <IconButton
+                        aria-label="edit"
+                        style={{ color: "gray" }}
+                        disabled
+                      >
+                        <EditIcon />
+                      </IconButton>
+                    )}
+              
+                    {isAdmin || isOwnRow ? (
+                      <IconButton
+                        aria-label="delete"
+                        style={{ color: "red" }}
+                        onClick={() => handleClickOpen(row._id)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    ) : (
+                      <IconButton
+                        aria-label="delete"
+                        style={{ color: "gray" }}
+                        disabled
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    )}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </TableContainer>
-      <ToastContainer
-        position="top-right"
-        autoClose={2000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
 
       <Dialog
         open={open}
-        keepMounted
         onClose={handleClose}
-        aria-describedby="alert-dialog-slide-description"
       >
-        <DialogTitle>{"Confirm Deletion"}</DialogTitle>
+        <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-slide-description">
+          <DialogContentText>
             Are you sure you want to delete this user? This action cannot be
             undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleConfirmDelete} color="error">
-            Delete
-          </Button>
+          <Button onClick={handleConfirmDelete}>Confirm</Button>
         </DialogActions>
       </Dialog>
 
-      <Dialog
-        open={editOpen}
-        onClose={() => setEditOpen(false)}
-        aria-labelledby="edit-dialog-title"
-        aria-describedby="edit-dialog-description"
-      >
-        <DialogTitle id="edit-dialog-title">Edit User</DialogTitle>
+      <Dialog open={editOpen} onClose={() => setEditOpen(false)}>
+        <DialogTitle>Edit User</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
             margin="dense"
             name="name"
             label="Name"
+            type="text"
             fullWidth
             variant="standard"
             value={editData.name}
             onChange={handleEditChange}
-            autoComplete="off"
           />
           <TextField
             margin="dense"
             name="username"
             label="Username"
+            type="text"
             fullWidth
             variant="standard"
             value={editData.username}
             onChange={handleEditChange}
-            autoComplete="off"
           />
           <TextField
             margin="dense"
             name="contact"
             label="Contact"
+            type="text"
             fullWidth
             variant="standard"
             value={editData.contact}
             onChange={handleEditChange}
-            autoComplete="off"
           />
           <input
+            accept="image/*"
             type="file"
             onChange={(e) =>
-              setEditData((prevState) => ({
-                ...prevState,
-                image: e.target.files[0],
-              }))
+              setEditData({ ...editData, image: e.target.files[0] })
             }
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setEditOpen(false)}>Cancel</Button>
-          <Button onClick={handleEditSubmit} color="primary">
-            Update
-          </Button>
+          <Button onClick={handleEditSubmit}>Save</Button>
         </DialogActions>
       </Dialog>
     </div>

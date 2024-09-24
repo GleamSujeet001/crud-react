@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
 import {
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  ViewList as ViewListIcon,
+  ViewModule as ViewModuleIcon,
+} from "@mui/icons-material";
+import {
   Box,
   Grid,
   Card,
@@ -29,17 +35,17 @@ import {
   TableRow,
   Paper,
 } from "@mui/material";
-import {
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  ViewList as ViewListIcon,
-  ViewModule as ViewModuleIcon,
-} from "@mui/icons-material";
 import { ToastContainer, toast } from "react-toastify";
 import axios from "axios";
 import "react-toastify/dist/ReactToastify.css";
 import ScaleLoader from "react-spinners/ScaleLoader";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFilePdf, faFileExcel } from "@fortawesome/free-solid-svg-icons";
+import Tooltip from "@mui/material/Tooltip";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import * as XLSX from "xlsx";
+import { Link, useNavigate } from "react-router-dom";
 function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
   const [rows, setRows] = useState([]);
   const [page, setPage] = useState(0);
@@ -53,6 +59,8 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
   const [loading, setLoading] = useState(false);
   const token = localStorage.getItem("token");
   const [filterStatus, setFilterStatus] = useState("All");
+  const UserDetails = JSON.parse(localStorage.getItem("UserDetails"));
+  const navigate = useNavigate();
   const [editData, setEditData] = useState({
     fname: "",
     lname: "",
@@ -69,27 +77,37 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
     { value: "Inactive", label: "Inactive" },
   ];
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true); // Start loader before fetching data
-      try {
-        const response = await axios.get(
-          "http://localhost:3939/get-student-data",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`, // Include token in the request
-            },
-          }
-        );
-        setRows(response.data);
-        setFilteredRows(response.data);
-      } catch (error) {
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        "http://localhost:3939/get-student-data",
+        { parentsId: UserDetails._id },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setRows(response.data);
+      setFilteredRows(response.data);
+    } catch (error) {
+      if (error.response && error.response.data.message === "Invalid token") {
+        toast.error("Session expired. Please log in again.");
+        localStorage.removeItem("userData");
+        localStorage.removeItem("UserDetails");
+        localStorage.removeItem("token");
+        localStorage.removeItem("isAuthenticated");
+        navigate("/login");
+      } else {
         console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false); // Stop loader once data is fetched
       }
-    };
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchData();
   }, [setUserImage]);
 
@@ -97,7 +115,6 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
     const applyFilters = () => {
       let filtered = rows;
 
-      // Apply search query filter
       if (searchQuery) {
         filtered = filtered.filter(
           (row) =>
@@ -107,7 +124,6 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
         );
       }
 
-      // Apply status filter
       if (filterStatus !== "All") {
         filtered = filtered.filter((row) => row.status === filterStatus);
       }
@@ -146,7 +162,7 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
   };
 
   const handleEditSubmit = async () => {
-    setLoading(true); // Start loader when submitting the edit form
+    setLoading(true);
     if (selectedRow) {
       const formData = new FormData();
       formData.append("fname", editData.fname);
@@ -172,22 +188,14 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
             },
           }
         );
-        const response = await axios.get(
-          "http://localhost:3939/get-student-data",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`, // Include token in the request
-            },
-          }
-        );
-        setRows(response.data);
+        fetchData();
         toast.success("Updated successfully!");
         setEditOpen(false);
       } catch (error) {
         console.error("Error updating item:", error);
         toast.error("Error updating item");
       } finally {
-        setLoading(false); // Stop loader after submission
+        setLoading(false);
       }
     }
   };
@@ -203,14 +211,14 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
   };
 
   const handleConfirmDelete = async () => {
-    setLoading(true); // Start loader before deleting
+    setLoading(true);
     if (selectedId) {
       try {
         await axios.delete(
           `http://localhost:3939/delete-student-data/${selectedId}`,
           {
             headers: {
-              Authorization: `Bearer ${token}`, // Include token in the request
+              Authorization: `Bearer ${token}`,
             },
           }
         );
@@ -221,7 +229,7 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
         console.error("Error deleting item:", error);
         handleClose();
       } finally {
-        setLoading(false); // Stop loader after deletion
+        setLoading(false);
       }
     }
   };
@@ -237,6 +245,57 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    const tableColumn = [
+      "S.no",
+      "Name",
+      "Email",
+      "Mobile",
+      "Gender",
+      "Status",
+      "Location",
+    ];
+    const tableRows = [];
+
+    filteredRows.forEach((row, index) => {
+      const studentData = [
+        index + 1,
+        `${row.fname} ${row.lname}`,
+        row.email,
+        row.mobile,
+        row.gender,
+        row.status,
+        row.location,
+      ];
+      tableRows.push(studentData);
+    });
+
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+    });
+
+    doc.save("student_data.pdf");
+  };
+
+  const exportToExcel = () => {
+    const studentData = filteredRows.map((row, index) => ({
+      "S.no": index + 1,
+      Name: `${row.fname} ${row.lname}`,
+      Email: row.email,
+      Mobile: row.mobile,
+      Gender: row.gender,
+      Status: row.status,
+      Location: row.location,
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(studentData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Students");
+
+    XLSX.writeFile(workbook, "student_data.xlsx");
+  };
 
   return (
     <Box sx={{ p: 2 }}>
@@ -251,7 +310,7 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            backgroundColor: "rgba(255, 255, 255, 0.7)", // Light overlay while loading
+            backgroundColor: "rgba(255, 255, 255, 0.7)",
             zIndex: 1100,
           }}
         >
@@ -259,35 +318,79 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
         </div>
       )}
 
-      <Box className="StatusDropDown" sx={{ mb: 2, display: "flex", justifyContent: "flex-end" }}>
-        <Select
-          sx={{ marginRight: "1rem" }}
-          value={filterStatus}
-          label="Status"
-          onChange={(e) => setFilterStatus(e.target.value)}
-        >
-          <MenuItem value="All">All</MenuItem>
-          <MenuItem value="Active">Active</MenuItem>
-          <MenuItem value="Inactive">Inactive</MenuItem>
-        </Select>
-
-        <Box>
-          <IconButton
-            aria-label="list view"
-            color={viewMode === "list" ? "primary" : "default"}
-            onClick={() => setViewMode("list")}
-          >
-            <ViewListIcon />
-          </IconButton>
-          <IconButton
-            aria-label="card view"
-            color={viewMode === "card" ? "primary" : "default"}
-            onClick={() => setViewMode("card")}
-          >
-            <ViewModuleIcon />
-          </IconButton>
+      <div
+        className="StatusDropDown"
+        style={{ mb: 2, display: "flex", justifyContent: "space-between" }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <h5>Total Records: {filteredRows.length}</h5>
         </Box>
-      </Box>
+        <Box sx={{ mb: 2, display: "flex", justifyContent: "space-between" }}>
+          <Tooltip title="Export to PDF">
+            <IconButton
+              onClick={exportToPDF}
+              sx={{
+                backgroundColor: "#f5f5f5",
+                borderRadius: "50%",
+                padding: "10px",
+                marginRight: "1rem",
+              }}
+            >
+              <FontAwesomeIcon
+                icon={faFilePdf}
+                size="sm"
+                style={{ color: "#d32f2f" }}
+              />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title="Export to Excel">
+            <IconButton
+              onClick={exportToExcel}
+              sx={{
+                backgroundColor: "#f5f5f5",
+                borderRadius: "50%",
+                padding: "10px",
+                marginRight: "1rem",
+              }}
+            >
+              <FontAwesomeIcon
+                icon={faFileExcel}
+                size="sm"
+                style={{ color: "#388e3c" }}
+              />
+            </IconButton>
+          </Tooltip>
+
+          <Select
+            sx={{ marginRight: "1rem" }}
+            value={filterStatus}
+            label="Status"
+            onChange={(e) => setFilterStatus(e.target.value)}
+          >
+            <MenuItem value="All">All</MenuItem>
+            <MenuItem value="Active">Active</MenuItem>
+            <MenuItem value="Inactive">Inactive</MenuItem>
+          </Select>
+
+          <Box>
+            <IconButton
+              aria-label="list view"
+              color={viewMode === "list" ? "primary" : "default"}
+              onClick={() => setViewMode("list")}
+            >
+              <ViewListIcon />
+            </IconButton>
+            <IconButton
+              aria-label="card view"
+              color={viewMode === "card" ? "primary" : "default"}
+              onClick={() => setViewMode("card")}
+            >
+              <ViewModuleIcon />
+            </IconButton>
+          </Box>
+        </Box>
+      </div>
       {viewMode === "list" ? (
         <TableContainer
           component={Paper}
@@ -406,7 +509,7 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
                 <CardMedia
                   component="div"
                   sx={{
-                    height: 140, // Set a fixed height for the image container
+                    height: 140,
                     backgroundImage: `url(${
                       row.profile
                         ? `http://localhost:3939/${
@@ -414,7 +517,7 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
                           }?t=${new Date().getTime()}`
                         : "/man.jpg"
                     })`,
-                    backgroundSize: "contain", // Scale the image to fit the container
+                    backgroundSize: "contain",
                     backgroundRepeat: "no-repeat",
                     backgroundPosition: "center",
                   }}

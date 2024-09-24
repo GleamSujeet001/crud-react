@@ -5,6 +5,7 @@ import Signup from "./pages/Signup";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "./pages/Header";
 import SignupList from "./pages/SignupList";
+import Chat from "./pages/Chat";
 import {
   BrowserRouter as Router,
   Route,
@@ -18,11 +19,12 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return localStorage.getItem("isAuthenticated") === "true";
   });
-  const [userData, setUserData] = useState(null); // Store user data
+  const [userData, setUserData] = useState(null); 
   const [userImage, setUserImage] = useState(null);
 
+  const UserDetails = JSON.parse(localStorage.getItem("UserDetails"));
+
   useEffect(() => {
-    // Store the authentication status in localStorage when it changes
     localStorage.setItem("isAuthenticated", isAuthenticated);
   }, [isAuthenticated]);
 
@@ -49,7 +51,7 @@ function App() {
           }
         />
         <Route
-          path="/Adduser"
+          path="/adduser"
           element={
             isAuthenticated ? (
               <Adduser setIsAuthenticated={setIsAuthenticated} />
@@ -58,10 +60,8 @@ function App() {
             )
           }
         />
-
-        {/* Protect the Student List route */}
         <Route
-          path="/Student-list"
+          path="/student-list"
           element={
             isAuthenticated ? (
               <StudentList
@@ -80,6 +80,10 @@ function App() {
         <Route
           path="/signup-list"
           element={isAuthenticated ? <SignupList /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/user-chat"
+          element={isAuthenticated ? <Chat UserDetails={UserDetails} /> : <Navigate to="/login" />}
         />
       </Routes>
     </Router>
