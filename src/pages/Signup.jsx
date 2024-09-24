@@ -22,7 +22,7 @@ const Signup = ({ setUserImage }) => {
     password: "",
   });
 
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (event) => {
     const { name, value, files } = event.target;
@@ -72,13 +72,16 @@ const Signup = ({ setUserImage }) => {
       formDataToSend.append(key, formData[key]);
     }
 
-    setLoading(true); 
+    setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3939/user-signup", {
-        method: "POST",
-        body: formDataToSend,
-      });
+      const response = await fetch(
+        "https://crud-node-kun7.onrender.com/user-signup",
+        {
+          method: "POST",
+          body: formDataToSend,
+        }
+      );
 
       if (response.ok) {
         const result = await response.json();
@@ -93,7 +96,7 @@ const Signup = ({ setUserImage }) => {
     } catch (error) {
       toast.error("Signup Failed!");
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
@@ -118,7 +121,7 @@ const Signup = ({ setUserImage }) => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            backgroundColor: "rgba(255, 255, 255, 0.7)", 
+            backgroundColor: "rgba(255, 255, 255, 0.7)",
             zIndex: 10,
           }}
         >
@@ -135,7 +138,7 @@ const Signup = ({ setUserImage }) => {
           boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)",
           width: "100%",
           maxWidth: "400px",
-          filter: loading ? "blur(3px)" : "none", 
+          filter: loading ? "blur(3px)" : "none",
           transition: "filter 0.3s ease",
         }}
       >

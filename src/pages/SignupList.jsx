@@ -24,7 +24,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { ToastContainer, toast } from "react-toastify";
 import ScaleLoader from "react-spinners/ScaleLoader";
 
-function SignupList({ setIsAuthenticated , }) {
+function SignupList({ setIsAuthenticated }) {
   const [rows, setRows] = useState([]);
   const [open, setOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -51,20 +51,25 @@ function SignupList({ setIsAuthenticated , }) {
     if (token) {
       setLoading(true);
       axios
-        .get("http://localhost:3939/get-user-data", {
+        .get("https://crud-node-kun7.onrender.com/get-user-data", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         })
         .then((response) => {
           const allRows = response.data;
-          const ownRow = allRows.filter(row => row._id === userDetails?._id);
-          const otherRows = allRows.filter(row => row._id !== userDetails?._id);
+          const ownRow = allRows.filter((row) => row._id === userDetails?._id);
+          const otherRows = allRows.filter(
+            (row) => row._id !== userDetails?._id
+          );
           setRows([...ownRow, ...otherRows]);
           setLoading(false);
         })
         .catch((error) => {
-          if (error.response && error.response.data.message === "Invalid token") {
+          if (
+            error.response &&
+            error.response.data.message === "Invalid token"
+          ) {
             toast.error("Session expired. Please log in again.");
             localStorage.removeItem("userData");
             localStorage.removeItem("UserDetails");
@@ -78,7 +83,6 @@ function SignupList({ setIsAuthenticated , }) {
         });
     }
   }, [token, userDetails]);
-  
 
   const handleEdit = (row) => {
     setSelectedRow(row);
@@ -110,7 +114,7 @@ function SignupList({ setIsAuthenticated , }) {
       setLoading(true);
       axios
         .put(
-          `http://localhost:3939/update-user-data/${selectedRow._id}`,
+          `https://crud-node-kun7.onrender.com/update-user-data/${selectedRow._id}`,
           formData,
           {
             headers: {
@@ -121,7 +125,7 @@ function SignupList({ setIsAuthenticated , }) {
         )
         .then(() => {
           axios
-            .get("http://localhost:3939/get-user-data", {
+            .get("https://crud-node-kun7.onrender.com/get-user-data", {
               headers: {
                 Authorization: `Bearer ${token}`,
               },
@@ -160,11 +164,14 @@ function SignupList({ setIsAuthenticated , }) {
     if (selectedId) {
       setLoading(true);
       axios
-        .delete(`http://localhost:3939/delete-user-data/${selectedId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
+        .delete(
+          `https://crud-node-kun7.onrender.com/delete-user-data/${selectedId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
         .then(() => {
           setRows(rows.filter((row) => row._id !== selectedId));
           toast.success("Deleted successfully!");
@@ -179,7 +186,6 @@ function SignupList({ setIsAuthenticated , }) {
         });
     }
   };
-
 
   return (
     <div style={{ padding: "1rem" }}>
@@ -218,7 +224,6 @@ function SignupList({ setIsAuthenticated , }) {
           </TableHead>
           <TableBody>
             {rows.map((row, index) => {
-             
               const isOwnRow = userDetails?._id === row._id;
 
               return (
@@ -230,7 +235,7 @@ function SignupList({ setIsAuthenticated , }) {
                       src={
                         row.imageUrl
                           ? `${row.imageUrl}?t=${new Date().getTime()}`
-                          : `http://localhost:3939/${
+                          : `https://crud-node-kun7.onrender.com/${
                               row.image
                             }?t=${new Date().getTime()}`
                       }
@@ -259,7 +264,7 @@ function SignupList({ setIsAuthenticated , }) {
                         <EditIcon />
                       </IconButton>
                     )}
-              
+
                     {isAdmin || isOwnRow ? (
                       <IconButton
                         aria-label="delete"
@@ -285,10 +290,7 @@ function SignupList({ setIsAuthenticated , }) {
         </Table>
       </TableContainer>
 
-      <Dialog
-        open={open}
-        onClose={handleClose}
-      >
+      <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
           <DialogContentText>

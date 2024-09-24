@@ -9,7 +9,7 @@ import {
   Button,
   Dialog,
 } from "@mui/material";
-import { styled } from '@mui/material/styles';
+import { styled } from "@mui/material/styles";
 import axios from "axios";
 import { toast } from "react-toastify";
 
@@ -29,7 +29,7 @@ const StyledAvatar = styled(Avatar)({
   boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
 });
 
-const baseURL = "http://localhost:3939/";
+const baseURL = "https://crud-node-kun7.onrender.com/";
 const token = localStorage.getItem("token");
 
 const ProfileCard = ({ open, onClose, onUpdate }) => {

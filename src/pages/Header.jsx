@@ -18,7 +18,7 @@ import { useNavigate } from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
 import AddIcon from "@mui/icons-material/Add";
 import LoginIcon from "@mui/icons-material/Login";
-import ProfileCard from "./ProfileCard"; 
+import ProfileCard from "./ProfileCard";
 import GroupIcon from "@mui/icons-material/Group";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import ChatIcon from "@mui/icons-material/Chat";
@@ -73,11 +73,11 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
     if (onSearch) {
-      onSearch(event.target.value); 
+      onSearch(event.target.value);
     }
   };
 
-  const baseURL = "http://localhost:3939/";
+  const baseURL = "https://crud-node-kun7.onrender.com/";
 
   const handleProfileUpdate = (updatedData) => {
     console.log("Updated profile data:", updatedData);

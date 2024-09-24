@@ -25,7 +25,7 @@ const Chat = () => {
   const [otherUserTyping, setOtherUserTyping] = useState(false);
   const typingTimeoutRef = useRef(null);
   const token = localStorage.getItem("token");
-  const socket = io("http://localhost:3939");
+  const socket = io("https://crud-node-kun7.onrender.com");
 
   useEffect(() => {
     const storedUserDetails = localStorage.getItem("UserDetails");
@@ -38,7 +38,7 @@ const Chat = () => {
   //   if (CurruntUserDetails) {
   //     console.log(CurruntUserDetails._id, "CurruntUserDetails");
 
-  //     const socket = io("http://localhost:3939", {
+  //     const socket = io("https://crud-node-kun7.onrender.com", {
   //       query: { userId: CurruntUserDetails._id },
   //     });
 
@@ -108,7 +108,7 @@ const Chat = () => {
     const crrUser = JSON.parse(localStorage.getItem("UserDetails"));
     setTimeout(() => {
       axios
-        .get(`http://localhost:3939/chat-users/${crrUser._id}`, {
+        .get(`https://crud-node-kun7.onrender.com/chat-users/${crrUser._id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -273,7 +273,7 @@ const Chat = () => {
                     src={
                       row.imageUrl
                         ? `${row.imageUrl}?t=${new Date().getTime()}`
-                        : `http://localhost:3939/${
+                        : `https://crud-node-kun7.onrender.com/${
                             row.image
                           }?t=${new Date().getTime()}`
                     }
@@ -310,7 +310,7 @@ const Chat = () => {
                       ? `${
                           CurruntUserDetails.imageUrl
                         }?t=${new Date().getTime()}`
-                      : `http://localhost:3939/${
+                      : `https://crud-node-kun7.onrender.com/${
                           CurruntUserDetails.image
                         }?t=${new Date().getTime()}`
                   }
@@ -337,7 +337,7 @@ const Chat = () => {
                     src={
                       selectedChat.imageUrl
                         ? `${selectedChat.imageUrl}?t=${new Date().getTime()}`
-                        : `http://localhost:3939/${
+                        : `https://crud-node-kun7.onrender.com/${
                             selectedChat.image
                           }?t=${new Date().getTime()}`
                     }

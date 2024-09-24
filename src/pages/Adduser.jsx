@@ -4,7 +4,7 @@ import Select from "react-select";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import ScaleLoader from "react-spinners/ScaleLoader"; 
+import ScaleLoader from "react-spinners/ScaleLoader";
 const token = localStorage.getItem("token");
 const UserDetails = JSON.parse(localStorage.getItem("UserDetails"));
 
@@ -18,7 +18,7 @@ function Adduser({ setIsAuthenticated }) {
     location: "",
   });
   const [status, setStatus] = useState(null);
-  const [preview, setPreview] = useState("man.jpg"); 
+  const [preview, setPreview] = useState("man.jpg");
   const [profile, setProfileState] = useState(null);
   const [loading, setLoading] = useState(false);
   const [formErrors, setFormErrors] = useState({});
@@ -91,7 +91,7 @@ function Adduser({ setIsAuthenticated }) {
 
     try {
       const response = await axios.post(
-        "http://localhost:3939/Add-student",
+        "https://crud-node-kun7.onrender.com/Add-student",
         formData,
         {
           headers: {
@@ -112,7 +112,7 @@ function Adduser({ setIsAuthenticated }) {
           location: "",
         });
         setProfileState(null);
-        setPreview("man.jpg"); 
+        setPreview("man.jpg");
         setStatus(null);
         setFormErrors({});
       } else {
@@ -140,7 +140,7 @@ function Adduser({ setIsAuthenticated }) {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              backgroundColor: "rgba(255, 255, 255, 0.8)", 
+              backgroundColor: "rgba(255, 255, 255, 0.8)",
               zIndex: 10,
             }}
           >
