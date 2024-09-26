@@ -49,7 +49,7 @@ import { Link, useNavigate } from "react-router-dom";
 function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
   const [rows, setRows] = useState([]);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(9);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [open, setOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [viewMode, setViewMode] = useState("list");
@@ -60,7 +60,10 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
   const token = localStorage.getItem("token");
   const [filterStatus, setFilterStatus] = useState("All");
   const UserDetails = JSON.parse(localStorage.getItem("UserDetails"));
+  const [previewImage, setPreviewImage] = useState(null);
+
   const navigate = useNavigate();
+
   const [editData, setEditData] = useState({
     fname: "",
     lname: "",
@@ -76,12 +79,22 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
     { value: "Active", label: "Active" },
     { value: "Inactive", label: "Inactive" },
   ];
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setPreviewImage(URL.createObjectURL(file));
+      setEditData((prevState) => ({
+        ...prevState,
+        image: file,
+      }));
+    }
+  };
 
   const fetchData = async () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        "https://crud-node-kun7.onrender.com/get-student-data",
+        "http://localhost:3939/get-student-data",
         { parentsId: UserDetails._id },
         {
           headers: {
@@ -143,8 +156,15 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
       gender: row.gender,
       status: row.status,
       location: row.location,
-      image: row.image,
+      image: row.profile,
     });
+    console.log(row, "row.Image");
+
+    if (row.profile) {
+      setPreviewImage(`http://localhost:3939/${row.profile}`);
+    } else {
+      setPreviewImage(null);
+    }
     setEditOpen(true);
   };
 
@@ -179,7 +199,7 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
 
       try {
         await axios.put(
-          `https://crud-node-kun7.onrender.com/update-student-data/${selectedRow._id}`,
+          `http://localhost:3939/update-student-data/${selectedRow._id}`,
           formData,
           {
             headers: {
@@ -215,7 +235,7 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
     if (selectedId) {
       try {
         await axios.delete(
-          `https://crud-node-kun7.onrender.com/delete-student-data/${selectedId}`,
+          `http://localhost:3939/delete-student-data/${selectedId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -392,76 +412,181 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
         </Box>
       </div>
       {viewMode === "list" ? (
-        <TableContainer
-          component={Paper}
-          sx={{ boxShadow: "0 2px 10px rgba(0, 0, 0, 0.2)" }}
-        >
-          <Table sx={{ minWidth: 650 }} aria-label="student table">
-            <TableHead>
-              <TableRow>
-                <TableCell align="center">
-                  <strong>S.no</strong>
-                </TableCell>
-                <TableCell align="center">
-                  <strong>Profile</strong>
-                </TableCell>
-                <TableCell align="center">
-                  <strong>Name</strong>
-                </TableCell>
-                <TableCell align="center">
-                  <strong>Email</strong>
-                </TableCell>
-                <TableCell align="center">
-                  <strong>Mobile</strong>
-                </TableCell>
-                <TableCell align="center">
-                  <strong>Gender</strong>
-                </TableCell>
-                <TableCell align="center">
-                  <strong>Status</strong>
-                </TableCell>
-                <TableCell align="center">
-                  <strong>Location</strong>
-                </TableCell>
+        <Paper sx={{ width: "100%", overflow: "hidden" }}>
+          <TableContainer
+            component={Paper}
+            sx={{
+              maxHeight: {
+                xs: "40vh",
+                sm: "60vh",
+                md: "77vh",
+              },
+              boxShadow: "0 2px 10px rgba(0, 0, 0, 0.2)",
+            }}
+          >
+            <Table
+              stickyHeader
+              sx={{ minWidth: 650 }}
+              aria-label="Customer table"
+            >
+              <TableHead>
+                <TableRow>
+                  <TableCell align="center">
+                    <strong>S.no</strong>
+                  </TableCell>
+                  <TableCell align="center">
+                    <strong>Profile</strong>
+                  </TableCell>
+                  <TableCell align="center">
+                    <strong>Name</strong>
+                  </TableCell>
+                  <TableCell align="center">
+                    <strong>Email</strong>
+                  </TableCell>
+                  <TableCell align="center">
+                    <strong>Mobile</strong>
+                  </TableCell>
+                  <TableCell align="center">
+                    <strong>Gender</strong>
+                  </TableCell>
+                  <TableCell align="center">
+                    <strong>Status</strong>
+                  </TableCell>
+                  <TableCell align="center">
+                    <strong>Location</strong>
+                  </TableCell>
 
-                <TableCell align="center">
-                  <strong>Action</strong>
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredRows
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row, index) => (
-                  <TableRow
-                    key={row._id}
-                    hover
+                  <TableCell align="center">
+                    <strong>Action</strong>
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredRows
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((row, index) => (
+                    <TableRow
+                      key={row._id}
+                      hover
+                      sx={{
+                        "&:nth-of-type(odd)": { backgroundColor: "#f9f9f9" },
+                      }}
+                    >
+                      <TableCell align="center">
+                        {index + 1 + page * rowsPerPage}
+                      </TableCell>
+                      <TableCell align="center">
+                        <Avatar
+                          alt={row.fname}
+                          src={
+                            row.profile
+                              ? `http://localhost:3939/${
+                                  row.profile
+                                }?t=${new Date().getTime()}`
+                              : "/man.png"
+                          }
+                        />
+                      </TableCell>
+                      <TableCell align="center">
+                        {row.fname} {row.lname}
+                      </TableCell>
+                      <TableCell align="center">{row.email}</TableCell>
+                      <TableCell align="center">{row.mobile}</TableCell>
+                      <TableCell align="center">{row.gender}</TableCell>
+                      <TableCell align="center">
+                        <span
+                          style={{
+                            color: row.status === "Active" ? "green" : "red",
+                          }}
+                        >
+                          {row.status}
+                        </span>
+                      </TableCell>
+                      <TableCell align="center">{row.location}</TableCell>
+
+                      <TableCell align="center">
+                        <IconButton
+                          aria-label="edit"
+                          style={{ color: "blue" }}
+                          onClick={() => handleEdit(row)}
+                        >
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton
+                          aria-label="delete"
+                          style={{ color: "red" }}
+                          onClick={() => handleClickOpen(row._id)}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+            <TablePagination
+              component="div"
+              count={rows.length}
+              page={page}
+              onPageChange={handleChangePage}
+              rowsPerPage={rowsPerPage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              sx={{
+                position: "sticky",
+                bottom: 0,
+                backgroundColor: "white",
+              }}
+            />
+          </TableContainer>
+        </Paper>
+      ) : (
+        <Box
+          sx={{
+            maxHeight: {
+              xs: "40vh",
+              sm: "60vh",
+              md: "77vh",
+            },
+            overflowY: "auto",
+            padding: "1rem",
+          }}
+        >
+          <Grid container spacing={2}>
+            {filteredRows.map((row) => (
+              <Grid item xs={12} sm={6} md={4} lg={3} key={row._id}>
+                <Card sx={{ maxWidth: 345, boxShadow: 3 ,paddingTop:"15px"}}>
+                  <CardMedia
+                    component="div"
                     sx={{
-                      "&:nth-of-type(odd)": { backgroundColor: "#f9f9f9" },
+                      height: 140,
+                      backgroundImage: `url(${
+                        row.profile
+                          ? `http://localhost:3939/${
+                              row.profile
+                            }?t=${new Date().getTime()}`
+                          : "/man.jpg"
+                      })`,
+                      backgroundSize: "contain",
+                      backgroundRepeat: "no-repeat",
+                      backgroundPosition: "center",
                     }}
-                  >
-                    <TableCell align="center">
-                      {index + 1 + page * rowsPerPage}
-                    </TableCell>
-                    <TableCell align="center">
-                      <Avatar
-                        alt={row.fname}
-                        src={
-                          row.profile
-                            ? `https://crud-node-kun7.onrender.com/${
-                                row.profile
-                              }?t=${new Date().getTime()}`
-                            : "/man.png"
-                        }
-                      />
-                    </TableCell>
-                    <TableCell align="center">
+                    title={`${row.fname} ${row.lname}`}
+                  />
+                  <CardContent>
+                    <Typography variant="h6" component="div">
                       {row.fname} {row.lname}
-                    </TableCell>
-                    <TableCell align="center">{row.email}</TableCell>
-                    <TableCell align="center">{row.mobile}</TableCell>
-                    <TableCell align="center">{row.gender}</TableCell>
-                    <TableCell align="center">
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Email: {row.email}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Mobile: {row.mobile}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Gender: {row.gender}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Status:{" "}
                       <span
                         style={{
                           color: row.status === "Active" ? "green" : "red",
@@ -469,107 +594,34 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
                       >
                         {row.status}
                       </span>
-                    </TableCell>
-                    <TableCell align="center">{row.location}</TableCell>
-
-                    <TableCell align="center">
-                      <IconButton
-                        aria-label="edit"
-                        style={{ color: "blue" }}
-                        onClick={() => handleEdit(row)}
-                      >
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton
-                        aria-label="delete"
-                        style={{ color: "red" }}
-                        onClick={() => handleClickOpen(row._id)}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-          <TablePagination
-            component="div"
-            count={rows.length}
-            page={page}
-            onPageChange={handleChangePage}
-            rowsPerPage={rowsPerPage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
-        </TableContainer>
-      ) : (
-        <Grid container spacing={2}>
-          {filteredRows.map((row) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={row._id}>
-              <Card sx={{ maxWidth: 345, boxShadow: 3 }}>
-                <CardMedia
-                  component="div"
-                  sx={{
-                    height: 140,
-                    backgroundImage: `url(${
-                      row.profile
-                        ? `https://crud-node-kun7.onrender.com/${
-                            row.profile
-                          }?t=${new Date().getTime()}`
-                        : "/man.jpg"
-                    })`,
-                    backgroundSize: "contain",
-                    backgroundRepeat: "no-repeat",
-                    backgroundPosition: "center",
-                  }}
-                  title={`${row.fname} ${row.lname}`}
-                />
-                <CardContent>
-                  <Typography variant="h6" component="div">
-                    {row.fname} {row.lname}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Email: {row.email}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Mobile: {row.mobile}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Gender: {row.gender}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Status:{" "}
-                    <span
-                      style={{
-                        color: row.status === "Active" ? "green" : "red",
-                      }}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Location: {row.location}
+                    </Typography>
+                  </CardContent>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "flex-end", p: 1 }}
+                  >
+                    <IconButton
+                      aria-label="edit"
+                      style={{ color: "blue" }}
+                      onClick={() => handleEdit(row)}
                     >
-                      {row.status}
-                    </span>
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Location: {row.location}
-                  </Typography>
-                </CardContent>
-                <Box sx={{ display: "flex", justifyContent: "flex-end", p: 1 }}>
-                  <IconButton
-                    aria-label="edit"
-                    style={{ color: "blue" }}
-                    onClick={() => handleEdit(row)}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton
-                    aria-label="delete"
-                    style={{ color: "red" }}
-                    onClick={() => handleClickOpen(row._id)}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </Box>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton
+                      aria-label="delete"
+                      style={{ color: "red" }}
+                      onClick={() => handleClickOpen(row._id)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
       )}
       <ToastContainer
         position="top-right"
@@ -612,7 +664,7 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
         style={{ zIndex: 1000 }}
         fullWidth
       >
-        <DialogTitle>Edit Student Data</DialogTitle>
+        <DialogTitle>Edit Customer Data</DialogTitle>
         <DialogContent>
           <TextField
             margin="dense"
@@ -692,14 +744,21 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
           <input
             type="file"
             accept="image/*"
-            onChange={(e) =>
-              setEditData((prevState) => ({
-                ...prevState,
-                image: e.target.files[0],
-              }))
-            }
+            onChange={handleImageChange}
             style={{ marginTop: "16px" }}
           />
+          {previewImage && (
+            <img
+              src={previewImage}
+              alt="Profile"
+              style={{
+                width: "100px",
+                height: "100px",
+                borderRadius: "50%",
+                marginTop: "16px",
+              }}
+            />
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setEditOpen(false)}>Cancel</Button>

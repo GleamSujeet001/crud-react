@@ -97,14 +97,14 @@ function Header({ setIsAuthenticated, userData, onSearch }) {
           }}
         >
           <img
-            src="/logo1.png"
+            src="https://www.pngplay.com/wp-content/uploads/7/Customer-Logo-Transparent-PNG.png"
             alt="Logo"
-            width="40"
+            width="50"
             height="35"
             className="d-inline-block align-text-top"
             style={{ marginRight: "0.5rem" }}
           />
-          <span style={{ fontWeight: "bold", fontSize: "1.5rem" }}>SMS</span>
+          <span style={{ fontWeight: "bold", fontSize: "1.5rem" }}>CMS</span>
         </NavLink>
 
         {location.pathname != "/" &&

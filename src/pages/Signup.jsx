@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import ScaleLoader from "react-spinners/ScaleLoader";
-
+import { registerRoute } from "../utils/APIRoutes";
 const Signup = ({ setUserImage }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -26,6 +26,7 @@ const Signup = ({ setUserImage }) => {
 
   const handleChange = (event) => {
     const { name, value, files } = event.target;
+
     if (name === "image" && files) {
       setFormData((prevState) => ({
         ...prevState,
@@ -37,7 +38,29 @@ const Signup = ({ setUserImage }) => {
         ...prevState,
         [name]: value,
       }));
-      if (value.trim() !== "") {
+
+      if (name === "username" && value.trim() !== "") {
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          [name]: emailPattern.test(value)
+            ? ""
+            : "Please enter a valid email address",
+        }));
+      } else if (name === "contact" && value.trim() !== "") {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          [name]: value.length === 10 ? "" : "Contact number must be 10 digits",
+        }));
+      } else if (name === "password" && value.trim() !== "") {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          [name]:
+            value.length >= 6
+              ? ""
+              : "Password must be atleast 6 char or digits",
+        }));
+      } else if (value.trim() !== "") {
         setErrors((prevErrors) => ({
           ...prevErrors,
           [name]: "",
@@ -47,18 +70,35 @@ const Signup = ({ setUserImage }) => {
   };
 
   const validateForm = () => {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     const newErrors = {
       name: formData.name.trim() === "" ? "Full Name is required" : "",
       username:
-        formData.username.trim() === "" ? "Email address is required" : "",
-      contact: formData.contact.trim() === "" ? "Contact No is required" : "",
-      password: formData.password.trim() === "" ? "Password is required" : "",
+        formData.username.trim() === ""
+          ? "Email address is required"
+          : !emailPattern.test(formData.username)
+          ? "Please enter a valid email address"
+          : "",
+      contact:
+        formData.contact.trim() === ""
+          ? "Contact No is required"
+          : formData.contact.length !== 10
+          ? "Contact number must be 10 digits"
+          : "",
+      password:
+        formData.password.trim() === ""
+          ? "Password is required"
+          : formData.password.length < 6
+          ? "Password must be atleast 6 char or digits"
+          : "",
     };
+
     setErrors(newErrors);
     const hasErrors = Object.values(newErrors).some(Boolean);
-    if (hasErrors) {
-      toast.error("All fields are mandatory except image");
-    }
+    // if (hasErrors) {
+    //   toast.error("All fields are mandatory except image");
+    // }
     return !hasErrors;
   };
 
@@ -75,13 +115,10 @@ const Signup = ({ setUserImage }) => {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        "https://crud-node-kun7.onrender.com/user-signup",
-        {
-          method: "POST",
-          body: formDataToSend,
-        }
-      );
+      const response = await fetch(registerRoute, {
+        method: "POST",
+        body: formDataToSend,
+      });
 
       if (response.ok) {
         const result = await response.json();
@@ -165,10 +202,10 @@ const Signup = ({ setUserImage }) => {
             onChange={handleChange}
             autoComplete="off"
             style={{
-              marginBottom: "1rem",
               borderColor: errors.name ? "red" : "",
             }}
           />
+          {errors.name && <span style={{ color: "red" }}>{errors.name}</span>}
         </div>
         <div className="mb-3">
           <label htmlFor="username" className="form-label">
@@ -183,10 +220,12 @@ const Signup = ({ setUserImage }) => {
             onChange={handleChange}
             autoComplete="off"
             style={{
-              marginBottom: "1rem",
               borderColor: errors.username ? "red" : "",
             }}
           />
+          {errors.username && (
+            <span style={{ color: "red" }}>{errors.username}</span>
+          )}
         </div>
         <div className="mb-3">
           <label htmlFor="contact" className="form-label">
@@ -201,10 +240,12 @@ const Signup = ({ setUserImage }) => {
             onChange={handleChange}
             autoComplete="off"
             style={{
-              marginBottom: "1rem",
               borderColor: errors.contact ? "red" : "",
             }}
           />
+          {errors.contact && (
+            <span style={{ color: "red" }}>{errors.contact}</span>
+          )}
         </div>
         <div className="mb-3">
           <label htmlFor="password" className="form-label">
@@ -218,11 +259,11 @@ const Signup = ({ setUserImage }) => {
             value={formData.password}
             onChange={handleChange}
             autoComplete="off"
-            style={{
-              marginBottom: "1rem",
-              borderColor: errors.password ? "red" : "",
-            }}
+            style={{ borderColor: errors.password ? "red" : "" }}
           />
+          {errors.password && (
+            <span style={{ color: "red" }}>{errors.password}</span>
+          )}
         </div>
         <div className="mb-3">
           <label htmlFor="image" className="form-label">
@@ -234,7 +275,7 @@ const Signup = ({ setUserImage }) => {
             name="image"
             id="image"
             onChange={handleChange}
-            style={{ marginBottom: "1rem" }}
+            style={{}}
           />
         </div>
         <Button
@@ -249,19 +290,7 @@ const Signup = ({ setUserImage }) => {
           Have an account? <Link to="/login">Create One</Link>
         </div>
       </form>
-
-      <ToastContainer
-        position="top-right"
-        autoClose={2000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
+      <ToastContainer />
     </div>
   );
 };

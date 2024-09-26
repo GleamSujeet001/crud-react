@@ -40,6 +40,7 @@ function SignupList({ setIsAuthenticated }) {
   const [userDetails, setUserDetails] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const token = localStorage.getItem("token");
+  const [previewImage, setPreviewImage] = useState(null);
 
   useEffect(() => {
     const storedUserDetails = JSON.parse(localStorage.getItem("UserDetails"));
@@ -83,6 +84,16 @@ function SignupList({ setIsAuthenticated }) {
         });
     }
   }, [token, userDetails]);
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setPreviewImage(URL.createObjectURL(file));
+      setEditData((prevState) => ({
+        ...prevState,
+        image: file,
+      }));
+    }
+  };
 
   const handleEdit = (row) => {
     setSelectedRow(row);
@@ -92,6 +103,11 @@ function SignupList({ setIsAuthenticated }) {
       contact: row.contact,
       image: row.image,
     });
+    if (row.image) {
+      setPreviewImage(`https://crud-node-kun7.onrender.com/${row.image}`);
+    } else {
+      setPreviewImage(null);
+    }
     setEditOpen(true);
   };
 
@@ -338,13 +354,19 @@ function SignupList({ setIsAuthenticated }) {
             value={editData.contact}
             onChange={handleEditChange}
           />
-          <input
-            accept="image/*"
-            type="file"
-            onChange={(e) =>
-              setEditData({ ...editData, image: e.target.files[0] })
-            }
-          />
+          <input accept="image/*" type="file" onChange={handleImageChange} />
+          {previewImage && (
+            <img
+              src={previewImage}
+              alt="Profile"
+              style={{
+                width: "100px",
+                height: "100px",
+                borderRadius: "50%",
+                marginTop: "16px",
+              }}
+            />
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setEditOpen(false)}>Cancel</Button>

@@ -5,10 +5,13 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ScaleLoader from "react-spinners/ScaleLoader";
+import { Link, useNavigate } from "react-router-dom";
+
 const token = localStorage.getItem("token");
 const UserDetails = JSON.parse(localStorage.getItem("UserDetails"));
 
 function Adduser({ setIsAuthenticated }) {
+  const navigate = useNavigate();
   const [inputdata, setInputData] = useState({
     fname: "",
     lname: "",
@@ -30,8 +33,45 @@ function Adduser({ setIsAuthenticated }) {
 
   const setInputValue = (e) => {
     const { name, value } = e.target;
+
     setInputData({ ...inputdata, [name]: value });
-    if (formErrors[name]) {
+
+    let error = "";
+
+    switch (name) {
+      case "fname":
+        if (!value) error = "First name is required.";
+        break;
+      case "lname":
+        if (!value) error = "Last name is required.";
+        break;
+      case "email":
+        if (!value) {
+          error = "Email is required.";
+        } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
+          error = "Invalid email address.";
+        }
+        break;
+      case "mobile":
+        if (!value) {
+          error = "Mobile number is required.";
+        } else if (!/^\d{10}$/.test(value)) {
+          error = "Mobile number must be 10 digits.";
+        }
+        break;
+      case "gender":
+        if (!value) error = "Gender is required.";
+        break;
+      case "location":
+        if (!value) error = "Address is required.";
+        break;
+      default:
+        break;
+    }
+
+    if (error) {
+      setFormErrors({ ...formErrors, [name]: error });
+    } else {
       const updatedErrors = { ...formErrors };
       delete updatedErrors[name];
       setFormErrors(updatedErrors);
@@ -115,6 +155,9 @@ function Adduser({ setIsAuthenticated }) {
         setPreview("man.jpg");
         setStatus(null);
         setFormErrors({});
+        setTimeout(() => {
+          navigate("/student-list");
+        }, 2000);
       } else {
         toast.error("Registration failed!");
       }
@@ -127,7 +170,7 @@ function Adduser({ setIsAuthenticated }) {
 
   return (
     <div className="container">
-      <h2 className="text-center mt-1">Register Student Details</h2>
+      <h2 className="text-center mt-1">Register Customer Details</h2>
       <Card className="shadow mt-3 p-3" style={{ position: "relative" }}>
         {loading && (
           <div

@@ -316,10 +316,11 @@
   background-color: #858585;
   border-radius: 1rem;
 }
-.contacts::-webkit-scrollbar {
+::-webkit-scrollbar {
   width: 0.3rem;
 }
-.contacts::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
   background-color: #858585;
   border-radius: 1rem;
 }
+

@@ -7,8 +7,8 @@ import ScaleLoader from "react-spinners/ScaleLoader";
 const Login = ({ setIsAuthenticated, setUserData }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    username: "admin@gmail.com",
-    password: "admin@123",
+    username: "sujeet@gmail.com",
+    password: "12345",
   });
   const [loading, setLoading] = useState(false);
 

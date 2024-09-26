@@ -12,7 +12,7 @@ import {
 import { styled } from "@mui/material/styles";
 import axios from "axios";
 import { toast } from "react-toastify";
-
+import "react-toastify/dist/ReactToastify.css";
 const StyledCard = styled(Card)(({ theme }) => ({
   maxWidth: 400,
   margin: "auto",
@@ -56,13 +56,12 @@ const ProfileCard = ({ open, onClose, onUpdate }) => {
   }, [open]);
 
   const handleSave = async () => {
-    // Form validation
     if (!oldPassword || !newPassword) {
       toast.error("Please fill in all the fields.");
       return;
     }
 
-    if (newPassword.length < 6) {
+    if (newPassword.length < 5) {
       toast.error("New password must be at least 6 characters long.");
       return;
     }
