@@ -94,7 +94,7 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
     setLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:3939/get-student-data",
+        "https://crud-node-kun7.onrender.com/get-student-data",
         { parentsId: UserDetails._id },
         {
           headers: {
@@ -161,7 +161,7 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
     console.log(row, "row.Image");
 
     if (row.profile) {
-      setPreviewImage(`http://localhost:3939/${row.profile}`);
+      setPreviewImage(`https://crud-node-kun7.onrender.com/${row.profile}`);
     } else {
       setPreviewImage(null);
     }
@@ -199,7 +199,7 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
 
       try {
         await axios.put(
-          `http://localhost:3939/update-student-data/${selectedRow._id}`,
+          `https://crud-node-kun7.onrender.com/update-student-data/${selectedRow._id}`,
           formData,
           {
             headers: {
@@ -235,7 +235,7 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
     if (selectedId) {
       try {
         await axios.delete(
-          `http://localhost:3939/delete-student-data/${selectedId}`,
+          `https://crud-node-kun7.onrender.com/delete-student-data/${selectedId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -480,7 +480,7 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
                           alt={row.fname}
                           src={
                             row.profile
-                              ? `http://localhost:3939/${
+                              ? `https://crud-node-kun7.onrender.com/${
                                   row.profile
                                 }?t=${new Date().getTime()}`
                               : "/man.png"
@@ -561,7 +561,7 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
                       height: 140,
                       backgroundImage: `url(${
                         row.profile
-                          ? `http://localhost:3939/${
+                          ? `https://crud-node-kun7.onrender.com/${
                               row.profile
                             }?t=${new Date().getTime()}`
                           : "/man.jpg"
