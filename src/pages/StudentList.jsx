@@ -554,7 +554,7 @@ function StudentList({ setIsAuthenticated, setUserImage, searchQuery }) {
           <Grid container spacing={2}>
             {filteredRows.map((row) => (
               <Grid item xs={12} sm={6} md={4} lg={3} key={row._id}>
-                <Card sx={{ maxWidth: 345, boxShadow: 3 ,paddingTop:"15px"}}>
+                <Card sx={{ maxWidth: 345, boxShadow: 3, paddingTop: "15px" }}>
                   <CardMedia
                     component="div"
                     sx={{
